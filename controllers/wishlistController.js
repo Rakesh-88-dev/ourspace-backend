@@ -2,11 +2,12 @@ const Wishlist = require("../models/Wishlist");
 
 exports.addItem = async (req, res) => {
   try {
-    const { title, link } = req.body;
+    const { title, link, category } = req.body;  // ← add category here
 
     const item = await Wishlist.create({
       title,
       link,
+      category,                                   // ← and here
       userId: req.user._id,
     });
 
