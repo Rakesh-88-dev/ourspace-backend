@@ -10,6 +10,20 @@ const {
   addReaction,
 } = require("../controllers/wishlistController");
 
+// 🌍 PUBLIC - GET ALL WISHLISTS (NO LOGIN NEEDED)
+router.get("/public", async (req, res) => {
+  try {
+    const items = await require("../models/Wishlist")
+      .find()
+      .populate("userId", "name avatar") // 👈 shows who added it
+      .sort({ createdAt: -1 });
+
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ➕ CREATE
 router.post("/", protect, addItem);
 

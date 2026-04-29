@@ -10,6 +10,7 @@ const messageRoutes = require("./routes/messageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const specialDateRoutes = require("./routes/specialDateRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const statsRoutes = require("./routes/statsRoutes");
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -34,6 +35,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/special-dates", specialDateRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/stats", statsRoutes);
 
 
 /* Static */
