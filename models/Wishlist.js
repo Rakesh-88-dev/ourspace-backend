@@ -1,19 +1,56 @@
 const mongoose = require("mongoose");
 
-const wishlistSchema = new mongoose.Schema({
-  title: String,
-  link: String,
-  image: String,
-  category: { type: String, default: "Places" },  // ← ADD THIS LINE
-  bought: {
-    type: Boolean,
-    default: false,
+const wishlistSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    link: {
+      type: String,
+      default: "",
+    },
+
+    image: {
+      type: String,
+      default: "",
+    },
+
+    // 🌈 CATEGORY (match frontend EXACTLY)
+    category: {
+      type: String,
+      default: "🌍 Places",
+    },
+
+    // ✅ STATUS
+    bought: {
+      type: Boolean,
+      default: false,
+    },
+
+    // 💑 SHARED
+    shared: {
+      type: Boolean,
+      default: false,
+    },
+
+    // ❤️ REACTIONS (safe structure)
+    reactions: {
+      type: Map,
+      of: Number,
+      default: {},
+    },
+
+    // 👤 USER
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  reactions: { type: Object, default: {} },        // ← ADD THIS LINE (if not already in your routes)
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Wishlist", wishlistSchema);
