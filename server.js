@@ -31,9 +31,10 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/memories", memoryRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/special-dates", specialDateRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+
 
 /* Static */
 app.use("/uploads", express.static("uploads"));

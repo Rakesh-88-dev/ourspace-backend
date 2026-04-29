@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      lowercase:true,
+      lowercase: true,
       unique: true,
     },
 
@@ -24,25 +24,30 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-   
+    // ✅ ADD THIS (important)
+    bio: {
+      type: String,
+      default: "",
+    },
+
     relationshipId: {
       type: String,
       default: null,
     },
 
-   // 💖 Special Dates
-specialDates: [
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    date: {
-      type: Date,
-      required: true,
-    },
-  },
-],
+    // 💖 Special Dates
+    specialDates: [
+      {
+        title: {
+          type: String,
+          required: true,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
