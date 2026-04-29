@@ -1,15 +1,11 @@
 const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("../config/cloudinary");
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "ourspace_avatars",
-    allowed_formats: ["jpg", "jpeg", "png"],
-  },
+// Store file in memory (not disk)
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
-
-const upload = multer({ storage });
 
 module.exports = upload;
