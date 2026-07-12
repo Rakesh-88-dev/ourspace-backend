@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    lastSeen: {
+  type: Date,
+  default: Date.now,
+},
+
     // 💖 Special Dates
     specialDates: [
       {

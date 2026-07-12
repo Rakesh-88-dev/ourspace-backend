@@ -12,6 +12,7 @@ const specialDateRoutes = require("./routes/specialDateRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const statsRoutes = require("./routes/statsRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const User = require("./models/User");
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -143,18 +144,22 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
+ socket.on("disconnect", async () => {
   console.log("User disconnected:", socket.id);
 
-  // Remove disconnected user
   for (const [userId, socketId] of onlineUsers.entries()) {
     if (socketId === socket.id) {
+
+      // Save last seen time
+      await User.findByIdAndUpdate(userId, {
+        lastSeen: new Date(),
+      });
+
       onlineUsers.delete(userId);
       break;
     }
   }
 
-  // Broadcast updated online list
   io.emit("online_users", Array.from(onlineUsers.keys()));
 });
 });
