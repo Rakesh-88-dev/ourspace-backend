@@ -219,8 +219,10 @@ socket.on("call_user", ({ to, from, callType }) => {
 });
 
 // User accepts the call
-socket.on("accept_call", ({ to }) => {
-  io.to(to).emit("call_accepted");
+socket.on("accept_call", ({ to, from }) => {
+  io.to(to).emit("call_accepted", {
+    from,
+  });
 });
 
 // User rejects the call
