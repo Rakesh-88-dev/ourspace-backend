@@ -72,10 +72,10 @@ io.on("connection", (socket) => {
  socket.on("join", (userId) => {
   socket.join(userId);
 
-  // Store socket against user
   onlineUsers.set(userId, socket.id);
 
-  // Send updated online users to everyone
+  console.log(`✅ ${userId} joined room ${userId}`);
+
   io.emit("online_users", Array.from(onlineUsers.keys()));
 });
   /* ===========================
@@ -200,17 +200,22 @@ await message.save();
 
 // User starts a call
 socket.on("call_user", ({ to, from, callType }) => {
+
   console.log("📞 Call Request");
+
   console.log({
     to,
     from,
     callType,
   });
 
+  console.log("Sending to room:", to);
+
   io.to(to).emit("incoming_call", {
     from,
     callType,
   });
+
 });
 
 // User accepts the call
