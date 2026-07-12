@@ -70,11 +70,16 @@ exports.loginUser = async (req, res) => {
     console.log("PASSWORD MATCH:", isMatch);
 
     if (isMatch) {
+
+      user.lastSeen = new Date();
+        await user.save();
+
       return res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         token: generateToken(user._id),
+        
       });
     } else {
       return res.status(401).json({
