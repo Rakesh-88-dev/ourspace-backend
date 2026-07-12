@@ -121,6 +121,40 @@ io.on("connection", (socket) => {
   });
 
   /* ===========================
+   DELETE MESSAGE
+=========================== */
+
+socket.on("delete_message", async ({ messageId }) => {
+  console.log("DELETE EVENT RECEIVED:", messageId);
+
+  try {
+    const message = await Message.findById(messageId);
+
+    console.log("MESSAGE FOUND:", message);
+
+    if (!message) return;
+
+    message.deleted = true;
+    await message.save();
+
+    console.log("MESSAGE UPDATED");
+
+    io.to(message.senderId.toString()).emit("message_deleted", {
+      messageId,
+    });
+
+    io.to(message.receiverId.toString()).emit("message_deleted", {
+      messageId,
+    });
+
+    console.log("EVENT EMITTED");
+
+  } catch (err) {
+    console.error("Delete Message Error:", err);
+  }
+});
+
+  /* ===========================
      MARK AS SEEN
   =========================== */
 

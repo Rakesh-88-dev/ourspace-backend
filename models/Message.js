@@ -11,6 +11,23 @@ const messageSchema = new mongoose.Schema(
       ref: "User",
     },
     text: String,
+
+status: {
+  type: String,
+  enum: ["sent", "delivered", "seen"],
+  default: "sent",
+},
+
+edited: {
+  type: Boolean,
+  default: false,
+},
+
+deleted: {
+  type: Boolean,
+  default: false,
+},
+
   },
   { timestamps: true }
 );
