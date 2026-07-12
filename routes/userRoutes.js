@@ -5,6 +5,21 @@ const protect = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 const cloudinary = require("../config/cloudinary");
 
+// 👥 GET ALL USERS (except myself)
+router.get("/", protect, async (req, res) => {
+  try {
+    const users = await User.find({
+      _id: { $ne: req.user._id },
+    }).select("-password");
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
+
 // 👤 GET USER
 router.get("/me", protect, async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
