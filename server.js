@@ -200,9 +200,16 @@ await message.save();
 
 // User starts a call
 socket.on("call_user", ({ to, from, callType }) => {
+  console.log("📞 Call Request");
+  console.log({
+    to,
+    from,
+    callType,
+  });
+
   io.to(to).emit("incoming_call", {
     from,
-    callType, // "voice" or "video"
+    callType,
   });
 });
 
