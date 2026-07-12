@@ -62,14 +62,21 @@ const io = new Server(server, {
 });
 
 const Message = require("./models/Message");
+// Store online users
+const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on("join", (userId) => {
-    socket.join(userId);
-  });
+ socket.on("join", (userId) => {
+  socket.join(userId);
 
+  // Store socket against user
+  onlineUsers.set(userId, socket.id);
+
+  // Send updated online users to everyone
+  io.emit("online_users", Array.from(onlineUsers.keys()));
+});
   /* ===========================
      TYPING INDICATOR
   =========================== */
@@ -137,8 +144,19 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+  console.log("User disconnected:", socket.id);
+
+  // Remove disconnected user
+  for (const [userId, socketId] of onlineUsers.entries()) {
+    if (socketId === socket.id) {
+      onlineUsers.delete(userId);
+      break;
+    }
+  }
+
+  // Broadcast updated online list
+  io.emit("online_users", Array.from(onlineUsers.keys()));
+});
 });
 
 /* Server */
