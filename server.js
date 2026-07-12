@@ -70,32 +70,74 @@ io.on("connection", (socket) => {
     socket.join(userId);
   });
 
-  /* SEND MESSAGE */
-  socket.on("send_message", async (data) => {
-    const { senderId, receiverId, text } = data;
+  /* ===========================
+     TYPING INDICATOR
+  =========================== */
 
-    const msg = await Message.create({
+  socket.on("typing", ({ senderId, receiverId }) => {
+    io.to(receiverId).emit("typing", {
       senderId,
-      receiverId,
-      text,
-      status: "sent",
     });
-
-    msg.status = "delivered";
-    await msg.save();
-
-    io.to(receiverId).emit("receive_message", msg);
-    io.to(senderId).emit("receive_message", msg);
   });
 
-  /* MARK SEEN */
-  socket.on("mark_seen", async ({ senderId, receiverId }) => {
-    await Message.updateMany(
-      { senderId, receiverId, status: { $ne: "seen" } },
-      { status: "seen" }
-    );
+  socket.on("stop_typing", ({ senderId, receiverId }) => {
+    io.to(receiverId).emit("stop_typing", {
+      senderId,
+    });
+  });
 
-    io.to(senderId).emit("messages_seen");
+  /* ===========================
+     SEND MESSAGE
+  =========================== */
+
+  socket.on("send_message", async (data) => {
+    try {
+      const { senderId, receiverId, text } = data;
+
+      const msg = await Message.create({
+        senderId,
+        receiverId,
+        text,
+        status: "sent",
+      });
+
+      msg.status = "delivered";
+      await msg.save();
+
+      io.to(receiverId).emit("receive_message", msg);
+      io.to(senderId).emit("receive_message", msg);
+
+    } catch (err) {
+      console.error("Socket Message Error:", err);
+    }
+  });
+
+  /* ===========================
+     MARK AS SEEN
+  =========================== */
+
+  socket.on("mark_seen", async ({ senderId, receiverId }) => {
+    try {
+      await Message.updateMany(
+        {
+          senderId,
+          receiverId,
+          status: { $ne: "seen" },
+        },
+        {
+          status: "seen",
+        }
+      );
+
+      io.to(senderId).emit("messages_seen");
+
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 
