@@ -164,10 +164,20 @@ socket.on("edit_message", async ({ messageId, text }) => {
 
     if (!message) return;
 
-    message.text = text;
-    message.edited = true;
+    const newText = text.trim();
 
-    await message.save();
+if (!newText) {
+  return;
+}
+
+if (newText === message.text.trim()) {
+  return;
+}
+
+message.text = newText;
+message.edited = true;
+
+await message.save();
 
     io.to(message.senderId.toString()).emit(
       "message_edited",
@@ -182,6 +192,48 @@ socket.on("edit_message", async ({ messageId, text }) => {
   } catch (err) {
     console.error("Edit Message Error:", err);
   }
+});
+
+/* ===========================
+   CALLING
+=========================== */
+
+// User starts a call
+socket.on("call_user", ({ to, from, callType }) => {
+  io.to(to).emit("incoming_call", {
+    from,
+    callType, // "voice" or "video"
+  });
+});
+
+// User accepts the call
+socket.on("accept_call", ({ to }) => {
+  io.to(to).emit("call_accepted");
+});
+
+// User rejects the call
+socket.on("reject_call", ({ to }) => {
+  io.to(to).emit("call_rejected");
+});
+
+// WebRTC Offer
+socket.on("offer", ({ to, offer }) => {
+  io.to(to).emit("offer", { offer });
+});
+
+// WebRTC Answer
+socket.on("answer", ({ to, answer }) => {
+  io.to(to).emit("answer", { answer });
+});
+
+// ICE Candidate
+socket.on("ice_candidate", ({ to, candidate }) => {
+  io.to(to).emit("ice_candidate", { candidate });
+});
+
+// End Call
+socket.on("end_call", ({ to }) => {
+  io.to(to).emit("call_ended");
 });
 
   /* ===========================
