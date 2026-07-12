@@ -235,9 +235,14 @@ socket.on("offer", ({ to, offer }) => {
   io.to(to).emit("offer", { offer });
 });
 
-// WebRTC Answer
 socket.on("answer", ({ to, answer }) => {
-  io.to(to).emit("answer", { answer });
+
+  console.log("ANSWER RECEIVED ON SERVER");
+
+  io.to(to).emit("answer", {
+    answer,
+  });
+
 });
 
 // ICE Candidate
