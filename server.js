@@ -154,6 +154,36 @@ socket.on("delete_message", async ({ messageId }) => {
   }
 });
 
+/* ===========================
+   EDIT MESSAGE
+=========================== */
+
+socket.on("edit_message", async ({ messageId, text }) => {
+  try {
+    const message = await Message.findById(messageId);
+
+    if (!message) return;
+
+    message.text = text;
+    message.edited = true;
+
+    await message.save();
+
+    io.to(message.senderId.toString()).emit(
+      "message_edited",
+      message
+    );
+
+    io.to(message.receiverId.toString()).emit(
+      "message_edited",
+      message
+    );
+
+  } catch (err) {
+    console.error("Edit Message Error:", err);
+  }
+});
+
   /* ===========================
      MARK AS SEEN
   =========================== */
