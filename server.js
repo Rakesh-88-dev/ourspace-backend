@@ -231,8 +231,15 @@ socket.on("reject_call", ({ to }) => {
 });
 
 // WebRTC Offer
-socket.on("offer", ({ to, offer }) => {
-  io.to(to).emit("offer", { offer });
+socket.on("offer", ({ to, offer, from }) => {
+
+  console.log("OFFER RECEIVED");
+
+  io.to(to).emit("offer", {
+    offer,
+    from,
+  });
+
 });
 
 socket.on("answer", ({ to, answer }) => {
