@@ -200,7 +200,6 @@ await message.save();
 
 // User starts a call
 socket.on("call_user", ({ to, from, callType }) => {
-
   console.log("📞 Call Request");
 
   console.log({
@@ -211,11 +210,14 @@ socket.on("call_user", ({ to, from, callType }) => {
 
   console.log("Sending to room:", to);
 
+  // Notify receiver
   io.to(to).emit("incoming_call", {
     from,
     callType,
   });
 
+  // Notify caller that the receiver's device is ringing
+  io.to(from).emit("call_ringing");
 });
 
 // User accepts the call
