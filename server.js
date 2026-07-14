@@ -217,7 +217,10 @@ socket.on("call_user", ({ to, from, callType }) => {
   });
 
   // Notify caller that the receiver's device is ringing
-  io.to(from).emit("call_ringing");
+});
+
+socket.on("ringing_started", ({ to }) => {
+  io.to(to).emit("call_ringing");
 });
 
 // User accepts the call
