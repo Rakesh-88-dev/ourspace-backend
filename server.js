@@ -230,6 +230,11 @@ socket.on("reject_call", ({ to }) => {
   io.to(to).emit("call_rejected");
 });
 
+// Caller cancelled before receiver answered
+socket.on("cancel_call", ({ to }) => {
+  io.to(to).emit("call_cancelled");
+});
+
 // WebRTC Offer
 socket.on("offer", ({ to, offer, from }) => {
 
