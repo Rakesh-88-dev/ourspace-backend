@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Message = require("../models/Message");
 const protect = require("../middleware/authMiddleware");
+const { searchMessages } = require("../controllers/messageController");
 
 // ✅ GET ALL MY MESSAGES (for testing or general use)
 router.get("/", protect, async (req, res) => {
@@ -20,6 +21,8 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+router.get("/search/:userId", protect, searchMessages);
 
 // 💬 GET CHAT BETWEEN TWO USERS
 router.get("/:userId", protect, async (req, res) => {
