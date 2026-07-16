@@ -271,6 +271,32 @@ socket.on("ice_candidate", ({ to, candidate }) => {
 socket.on("end_call", ({ to }) => {
   io.to(to).emit("call_ended");
 });
+/* ===========================
+   VIDEO UPGRADE
+=========================== */
+
+// Caller requests to switch to video
+socket.on("upgrade_video_request", ({ to, from }) => {
+  console.log("📹 Video upgrade requested");
+
+  io.to(to).emit("upgrade_video_request", {
+    from,
+  });
+});
+
+// Receiver accepted
+socket.on("upgrade_video_accept", ({ to }) => {
+  console.log("✅ Video upgrade accepted");
+
+  io.to(to).emit("upgrade_video_accept");
+});
+
+// Receiver rejected
+socket.on("upgrade_video_reject", ({ to }) => {
+  console.log("❌ Video upgrade rejected");
+
+  io.to(to).emit("upgrade_video_reject");
+});
 
   /* ===========================
      MARK AS SEEN
@@ -315,6 +341,7 @@ socket.on("end_call", ({ to }) => {
   io.emit("online_users", Array.from(onlineUsers.keys()));
 });
 });
+
 
 /* Server */
 const PORT = process.env.PORT || 5000;
