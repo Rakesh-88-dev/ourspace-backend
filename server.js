@@ -100,26 +100,52 @@ io.on("connection", (socket) => {
   =========================== */
 
   socket.on("send_message", async (data) => {
-    try {
-      const { senderId, receiverId, text } = data;
+  try {
+    const {
+      senderId,
+      receiverId,
 
-      const msg = await Message.create({
-        senderId,
-        receiverId,
-        text,
-        status: "sent",
-      });
+      text,
 
-      msg.status = "delivered";
-      await msg.save();
+      type,
+      mediaUrl,
+      thumbnail,
+      caption,
 
-      io.to(receiverId).emit("receive_message", msg);
-      io.to(senderId).emit("receive_message", msg);
+      fileName,
+      fileSize,
+      mimeType,
+    } = data;
 
-    } catch (err) {
-      console.error("Socket Message Error:", err);
-    }
-  });
+    const msg = await Message.create({
+      senderId,
+      receiverId,
+
+      text: text || "",
+
+      type: type || "text",
+
+      mediaUrl: mediaUrl || "",
+      thumbnail: thumbnail || "",
+      caption: caption || "",
+
+      fileName: fileName || "",
+      fileSize: fileSize || 0,
+      mimeType: mimeType || "",
+
+      status: "sent",
+    });
+
+    msg.status = "delivered";
+    await msg.save();
+
+    io.to(receiverId).emit("receive_message", msg);
+    io.to(senderId).emit("receive_message", msg);
+
+  } catch (err) {
+    console.error("Socket Message Error:", err);
+  }
+});
 
   /* ===========================
    DELETE MESSAGE

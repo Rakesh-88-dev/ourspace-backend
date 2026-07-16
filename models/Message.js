@@ -5,11 +5,13 @@ const messageSchema = new mongoose.Schema(
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
 
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
 
     // ==========================
@@ -17,7 +19,7 @@ const messageSchema = new mongoose.Schema(
     // ==========================
     type: {
       type: String,
-      enum: ["text", "image", "video", "file", "audio"],
+      enum: ["text", "image", "video", "audio", "file"],
       default: "text",
     },
 
@@ -27,6 +29,7 @@ const messageSchema = new mongoose.Schema(
     text: {
       type: String,
       default: "",
+      trim: true,
     },
 
     // ==========================
@@ -45,6 +48,7 @@ const messageSchema = new mongoose.Schema(
     caption: {
       type: String,
       default: "",
+      trim: true,
     },
 
     // ==========================
@@ -74,6 +78,9 @@ const messageSchema = new mongoose.Schema(
       default: "sent",
     },
 
+    // ==========================
+    // Edit / Delete
+    // ==========================
     edited: {
       type: Boolean,
       default: false,
