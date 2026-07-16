@@ -72,9 +72,10 @@ io.on("connection", (socket) => {
  socket.on("join", (userId) => {
   socket.join(userId);
 
-  onlineUsers.set(userId, socket.id);
-
   console.log(`✅ ${userId} joined room ${userId}`);
+  console.log("Rooms:", [...socket.rooms]);
+
+  onlineUsers.set(userId, socket.id);
 
   io.emit("online_users", Array.from(onlineUsers.keys()));
 });
