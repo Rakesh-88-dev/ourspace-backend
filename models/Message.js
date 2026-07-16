@@ -6,30 +6,87 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    text: String,
 
-status: {
-  type: String,
-  enum: ["sent", "delivered", "seen"],
-  default: "sent",
-},
+    // ==========================
+    // Message Type
+    // ==========================
+    type: {
+      type: String,
+      enum: ["text", "image", "video", "file", "audio"],
+      default: "text",
+    },
 
-edited: {
-  type: Boolean,
-  default: false,
-},
+    // ==========================
+    // Text Message
+    // ==========================
+    text: {
+      type: String,
+      default: "",
+    },
 
-deleted: {
-  type: Boolean,
-  default: false,
-},
+    // ==========================
+    // Media
+    // ==========================
+    mediaUrl: {
+      type: String,
+      default: "",
+    },
 
+    thumbnail: {
+      type: String,
+      default: "",
+    },
+
+    caption: {
+      type: String,
+      default: "",
+    },
+
+    // ==========================
+    // File Details
+    // ==========================
+    fileName: {
+      type: String,
+      default: "",
+    },
+
+    fileSize: {
+      type: Number,
+      default: 0,
+    },
+
+    mimeType: {
+      type: String,
+      default: "",
+    },
+
+    // ==========================
+    // Message Status
+    // ==========================
+    status: {
+      type: String,
+      enum: ["sent", "delivered", "seen"],
+      default: "sent",
+    },
+
+    edited: {
+      type: Boolean,
+      default: false,
+    },
+
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model("Message", messageSchema);
