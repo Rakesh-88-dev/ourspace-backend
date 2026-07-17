@@ -102,39 +102,45 @@ io.on("connection", (socket) => {
   socket.on("send_message", async (data) => {
   try {
     const {
-      senderId,
-      receiverId,
+  senderId,
+  receiverId,
 
-      text,
+  text,
 
-      type,
-      mediaUrl,
-      thumbnail,
-      caption,
+  type,
+  media,
 
-      fileName,
-      fileSize,
-      mimeType,
-    } = data;
+  mediaUrl,
+  thumbnail,
+  caption,
+
+  fileName,
+  fileSize,
+  mimeType,
+} = data;
 
     const msg = await Message.create({
-      senderId,
-      receiverId,
+  senderId,
+  receiverId,
 
-      text: text || "",
+  text: text || "",
 
-      type: type || "text",
+  type: type || "text",
 
-      mediaUrl: mediaUrl || "",
-      thumbnail: thumbnail || "",
-      caption: caption || "",
+  // Gallery
+  media: media || [],
 
-      fileName: fileName || "",
-      fileSize: fileSize || 0,
-      mimeType: mimeType || "",
+  // Single media (kept for backward compatibility)
+  mediaUrl: mediaUrl || "",
+  thumbnail: thumbnail || "",
+  caption: caption || "",
 
-      status: "sent",
-    });
+  fileName: fileName || "",
+  fileSize: fileSize || 0,
+  mimeType: mimeType || "",
+
+  status: "sent",
+});
 
     msg.status = "delivered";
     await msg.save();

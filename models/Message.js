@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema(
     // ==========================
     type: {
       type: String,
-      enum: ["text", "image", "video", "audio", "file"],
+      enum: ["text", "image", "video", "audio", "file", "gallery"],
       default: "text",
     },
 
@@ -50,6 +50,38 @@ const messageSchema = new mongoose.Schema(
       default: "",
       trim: true,
     },
+
+    // ==========================
+// Gallery Media
+// ==========================
+media: [
+  {
+    mediaUrl: {
+      type: String,
+      default: "",
+    },
+
+    fileName: {
+      type: String,
+      default: "",
+    },
+
+    fileSize: {
+      type: Number,
+      default: 0,
+    },
+
+    mimeType: {
+      type: String,
+      default: "",
+    },
+
+    thumbnail: {
+      type: String,
+      default: "",
+    },
+  },
+],
 
     // ==========================
     // File Details
