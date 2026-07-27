@@ -4,6 +4,10 @@ const relationshipRepository = require(
   "../../relationship/repositories/relationship.repository"
 );
 
+const {
+  calculateEventData,
+} = require("../utils/dateCalculator");
+
 const ForbiddenError = require("../../errors/ForbiddenError");
 const NotFoundError = require("../../errors/NotFoundError");
 
@@ -39,30 +43,16 @@ const getSpecialDates = async (userId) => {
       relationship._id
     );
 
-  const today = new Date();
-
-  return specialDates.map((item) => {
-    const data = item.toObject();
-
-    if (data.type.toLowerCase() === "anniversary") {
-  data.daysTogether = Math.floor(
-    (today - new Date(data.date)) /
-      (1000 * 60 * 60 * 24)
+  return specialDates.map((item) =>
+    calculateEventData(item.toObject())
   );
-} else {
-  data.daysLeft = Math.ceil(
-    (new Date(data.date) - today) /
-      (1000 * 60 * 60 * 24)
-  );
-}
-
-    return data;
-  });
 };
+
 const updateSpecialDate = async (userId, specialDateId, data) => {
   const relationship = await getActiveRelationship(userId);
 
-  const specialDate = await specialDateRepository.findById(specialDateId);
+  const specialDate =
+    await specialDateRepository.findById(specialDateId);
 
   if (!specialDate) {
     throw new NotFoundError("Special date not found.");
@@ -80,7 +70,8 @@ const updateSpecialDate = async (userId, specialDateId, data) => {
 const deleteSpecialDate = async (userId, specialDateId) => {
   const relationship = await getActiveRelationship(userId);
 
-  const specialDate = await specialDateRepository.findById(specialDateId);
+  const specialDate =
+    await specialDateRepository.findById(specialDateId);
 
   if (!specialDate) {
     throw new NotFoundError("Special date not found.");
@@ -108,35 +99,10 @@ const getUpcomingSpecialDates = async (userId) => {
       relationship._id
     );
 
-  const today = new Date();
-
-  const upcoming = dates
-    .map((item) => {
-      let nextDate = new Date(item.date);
-
-      if (item.isRecurring) {
-        nextDate.setFullYear(today.getFullYear());
-
-        if (nextDate < today) {
-          nextDate.setFullYear(today.getFullYear() + 1);
-        }
-      }
-
-      const diff =
-        Math.ceil(
-          (nextDate - today) /
-            (1000 * 60 * 60 * 24)
-        );
-
-      return {
-        ...item.toObject(),
-        daysRemaining: diff,
-      };
-    })
-    .filter((item) => item.daysRemaining >= 0)
-    .sort((a, b) => a.daysRemaining - b.daysRemaining);
-
-  return upcoming;
+  return dates
+    .map((item) => calculateEventData(item.toObject()))
+    .filter((item) => item.daysLeft >= 0)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
 };
 
 const getTodaySpecialDates = async (userId) => {
@@ -167,7 +133,8 @@ const getTodaySpecialDates = async (userId) => {
 const togglePinSpecialDate = async (userId, specialDateId) => {
   const relationship = await getActiveRelationship(userId);
 
-  const specialDate = await specialDateRepository.findById(specialDateId);
+  const specialDate =
+    await specialDateRepository.findById(specialDateId);
 
   if (!specialDate) {
     throw new NotFoundError("Special date not found.");
@@ -190,45 +157,10 @@ const getPinnedEvents = async (userId) => {
       relationship._id
     );
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const events = pinnedEvents.map((event) => {
-    const data = event.toObject();
-
-    let nextOccurrence = new Date(data.date);
-
-    if (data.isRecurring || data.type === "Anniversary") {
-      nextOccurrence.setFullYear(today.getFullYear());
-
-      if (nextOccurrence < today) {
-        nextOccurrence.setFullYear(today.getFullYear() + 1);
-      }
-    }
-
-    const daysLeft = Math.ceil(
-      (nextOccurrence - today) /
-      (1000 * 60 * 60 * 24)
-    );
-
-    if (data.type === "Anniversary") {
-      data.daysTogether = Math.floor(
-        (today - new Date(data.date)) /
-        (1000 * 60 * 60 * 24)
-      );
-    }
-
-    data.daysLeft = daysLeft;
-    data.nextOccurrence = nextOccurrence;
-
-    return data;
-  });
-
-  events.sort((a, b) => a.daysLeft - b.daysLeft);
-
-  return events;
+  return pinnedEvents
+    .map((event) => calculateEventData(event.toObject()))
+    .sort((a, b) => a.daysLeft - b.daysLeft);
 };
-
 
 module.exports = {
   createSpecialDate,
@@ -237,8 +169,6 @@ module.exports = {
   deleteSpecialDate,
   getUpcomingSpecialDates,
   getTodaySpecialDates,
-
   togglePinSpecialDate,
-getPinnedEvents,
- 
+  getPinnedEvents,
 };

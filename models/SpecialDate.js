@@ -30,6 +30,24 @@ const specialDateSchema = new mongoose.Schema(
   ],
   default: "Custom",
 },
+occasionCategory: {
+  type: String,
+  enum: [
+    "relationship",
+    "birthday",
+    "travel",
+    "holiday",
+    "achievement",
+    "meeting",
+    "custom",
+  ],
+  default: "custom",
+},
+
+isRecurring: {
+  type: Boolean,
+  default: false,
+},
 
 note: {
   type: String,
@@ -43,13 +61,7 @@ isPinned: {
   default: false,
 },
 
-isRecurring: {
-  type: Boolean,
-  default: false,
-},
-
-
-    relationship: {
+relationship: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "Relationship",
   required: true,
