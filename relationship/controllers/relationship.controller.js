@@ -38,11 +38,13 @@ class RelationshipController {
 
 async acceptInvitation(req, res, next) {
   try {
+    const { anniversaryDate } = req.body;
 
     const relationship =
       await relationshipService.acceptInvitation(
         req.params.invitationId,
-        req.user._id
+        req.user._id,
+        anniversaryDate
       );
 
     return res.status(200).json({
@@ -50,7 +52,6 @@ async acceptInvitation(req, res, next) {
       message: "Invitation accepted successfully.",
       data: relationship,
     });
-
   } catch (error) {
     next(error);
   }

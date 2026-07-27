@@ -123,7 +123,11 @@ async getPendingInvitations(userId) {
 
 
 
-async acceptInvitation(invitationId, userId) {
+async acceptInvitation(
+  invitationId,
+  userId,
+  anniversaryDate
+) {
   const session = await mongoose.startSession();
 
   try {
@@ -153,6 +157,26 @@ async acceptInvitation(invitationId, userId) {
       "Invitation has expired."
     );
   }
+
+  if (!anniversaryDate) {
+  throw new ConflictError(
+    "Anniversary date is required."
+  );
+}
+
+const anniversary = new Date(anniversaryDate);
+
+if (isNaN(anniversary.getTime())) {
+  throw new ConflictError(
+    "Invalid anniversary date."
+  );
+}
+
+if (anniversary > new Date()) {
+  throw new ConflictError(
+    "Anniversary cannot be in the future."
+  );
+}
 
   const senderRelationship =
     await relationshipRepository.findByMember(
@@ -190,6 +214,9 @@ async acceptInvitation(invitationId, userId) {
           invitation.receiver.toString()
         ),
       invitedBy: invitation.sender,
+
+      anniversaryDate: anniversary,
+
       connectedAt: new Date(),
     },
     session
