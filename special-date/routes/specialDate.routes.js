@@ -62,9 +62,9 @@ router.patch(
 );
 
 router.get(
-  "/pinned/upcoming",
+  "/pinned",
   protect,
-  specialDateController.getPinnedUpcoming
+  specialDateController.getPinnedEvents
 );
 
 module.exports = router;

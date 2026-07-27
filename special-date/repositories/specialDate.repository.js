@@ -51,11 +51,11 @@ const togglePin = async (id) => {
   return specialDate.save();
 };
 
-const findPinnedByRelationship = (relationshipId) => {
+const findPinnedByRelationship = async (relationshipId) => {
   return SpecialDate.find({
     relationship: relationshipId,
     isPinned: true,
-  }).sort({ date: 1 });
+  });
 };
 
 module.exports = {

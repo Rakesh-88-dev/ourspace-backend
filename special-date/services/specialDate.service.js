@@ -182,29 +182,23 @@ const togglePinSpecialDate = async (userId, specialDateId) => {
   return specialDateRepository.togglePin(specialDateId);
 };
 
-const getPinnedUpcomingEvent = async (userId) => {
+const getPinnedEvents = async (userId) => {
   const relationship = await getActiveRelationship(userId);
-
-  console.log("Relationship:", relationship._id);
 
   const pinnedEvents =
     await specialDateRepository.findPinnedByRelationship(
       relationship._id
     );
 
-  console.log("Pinned Events:", pinnedEvents);
-
-  if (!pinnedEvents.length) {
-    return null;
-  }
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const upcomingEvents = pinnedEvents.map((event) => {
-    const nextOccurrence = new Date(event.date);
+  const events = pinnedEvents.map((event) => {
+    const data = event.toObject();
 
-    if (event.isRecurring) {
+    let nextOccurrence = new Date(data.date);
+
+    if (data.isRecurring || data.type === "Anniversary") {
       nextOccurrence.setFullYear(today.getFullYear());
 
       if (nextOccurrence < today) {
@@ -217,18 +211,22 @@ const getPinnedUpcomingEvent = async (userId) => {
       (1000 * 60 * 60 * 24)
     );
 
-    return {
-      event,
-      daysLeft,
-    };
+    if (data.type === "Anniversary") {
+      data.daysTogether = Math.floor(
+        (today - new Date(data.date)) /
+        (1000 * 60 * 60 * 24)
+      );
+    }
+
+    data.daysLeft = daysLeft;
+    data.nextOccurrence = nextOccurrence;
+
+    return data;
   });
 
-  upcomingEvents.sort((a, b) => a.daysLeft - b.daysLeft);
+  events.sort((a, b) => a.daysLeft - b.daysLeft);
 
-  return {
-    ...upcomingEvents[0].event.toObject(),
-    daysLeft: upcomingEvents[0].daysLeft,
-  };
+  return events;
 };
 
 
@@ -241,5 +239,6 @@ module.exports = {
   getTodaySpecialDates,
 
   togglePinSpecialDate,
-  getPinnedUpcomingEvent,
+getPinnedEvents,
+ 
 };

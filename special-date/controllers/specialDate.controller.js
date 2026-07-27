@@ -81,16 +81,15 @@ const togglePin = asyncHandler(async (req, res) => {
   });
 });
 
-const getPinnedUpcoming = asyncHandler(async (req, res) => {
-  const event =
-    await specialDateService.getPinnedUpcomingEvent(
+const getPinnedEvents = asyncHandler(async (req, res) => {
+  const events =
+    await specialDateService.getPinnedEvents(
       req.user._id
     );
 
   res.status(200).json({
     success: true,
-    message: "Pinned upcoming event fetched.",
-    data: event,
+    data: events,
   });
 });
 
@@ -103,5 +102,5 @@ module.exports = {
   getTodaySpecialDates,
 
   togglePin,
-  getPinnedUpcoming,
+  getPinnedEvents,
 };
