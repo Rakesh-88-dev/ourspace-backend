@@ -41,6 +41,23 @@ const findTodayByRelationship = (relationshipId) => {
   });
 };
 
+const togglePin = async (id) => {
+  const specialDate = await SpecialDate.findById(id);
+
+  if (!specialDate) return null;
+
+  specialDate.isPinned = !specialDate.isPinned;
+
+  return specialDate.save();
+};
+
+const findPinnedByRelationship = (relationshipId) => {
+  return SpecialDate.find({
+    relationship: relationshipId,
+    isPinned: true,
+  }).sort({ date: 1 });
+};
+
 module.exports = {
   create,
   findById,
@@ -50,4 +67,7 @@ module.exports = {
   save,
   findUpcomingByRelationship,
   findTodayByRelationship,
+
+  togglePin,
+  findPinnedByRelationship,
 };

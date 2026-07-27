@@ -38,6 +38,11 @@ note: {
   default: "",
 },
 
+isPinned: {
+  type: Boolean,
+  default: false,
+},
+
 isRecurring: {
   type: Boolean,
   default: false,

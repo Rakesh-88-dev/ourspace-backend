@@ -67,6 +67,35 @@ const getTodaySpecialDates = asyncHandler(async (req, res) => {
   });
 });
 
+const togglePin = asyncHandler(async (req, res) => {
+  const specialDate =
+    await specialDateService.togglePinSpecialDate(
+      req.user._id,
+      req.params.id
+    );
+
+  successResponse(
+    res,
+    200,
+    "Special date pin updated.",
+    specialDate
+  );
+});
+
+const getPinnedUpcoming = asyncHandler(async (req, res) => {
+  const event =
+    await specialDateService.getPinnedUpcomingEvent(
+      req.user._id
+    );
+
+  successResponse(
+    res,
+    200,
+    "Pinned upcoming event fetched.",
+    event
+  );
+});
+
 module.exports = {
   createSpecialDate,
   getSpecialDates,
@@ -74,4 +103,7 @@ module.exports = {
   deleteSpecialDate,
   getUpcomingSpecialDates,
   getTodaySpecialDates,
+
+  togglePin,
+  getPinnedUpcoming,
 };

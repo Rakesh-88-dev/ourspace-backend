@@ -55,4 +55,16 @@ router.get(
   specialDateController.getTodaySpecialDates
 );
 
+router.patch(
+  "/:id/pin",
+  protect,
+  specialDateController.togglePin
+);
+
+router.get(
+  "/pinned/upcoming",
+  protect,
+  specialDateController.getPinnedUpcoming
+);
+
 module.exports = router;

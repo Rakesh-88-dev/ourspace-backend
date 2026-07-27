@@ -45,16 +45,16 @@ const getSpecialDates = async (userId) => {
     const data = item.toObject();
 
     if (data.type.toLowerCase() === "anniversary") {
-      data.daysTogether = Math.floor(
-        (today - new Date(data.date)) /
-          (1000 * 60 * 60 * 24)
-      );
-    } else {
-      data.daysLeft = Math.ceil(
-        (new Date(data.date) - today) /
-          (1000 * 60 * 60 * 24)
-      );
-    }
+  data.daysTogether = Math.floor(
+    (today - new Date(data.date)) /
+      (1000 * 60 * 60 * 24)
+  );
+} else {
+  data.daysLeft = Math.ceil(
+    (new Date(data.date) - today) /
+      (1000 * 60 * 60 * 24)
+  );
+}
 
     return data;
   });
@@ -164,6 +164,67 @@ const getTodaySpecialDates = async (userId) => {
   });
 };
 
+const togglePinSpecialDate = async (userId, specialDateId) => {
+  const relationship = await getActiveRelationship(userId);
+
+  const specialDate = await specialDateRepository.findById(specialDateId);
+
+  if (!specialDate) {
+    throw new NotFoundError("Special date not found.");
+  }
+
+  if (!specialDate.relationship.equals(relationship._id)) {
+    throw new ForbiddenError(
+      "You are not authorized to update this special date."
+    );
+  }
+
+  return specialDateRepository.togglePin(specialDateId);
+};
+
+const getPinnedUpcomingEvent = async (userId) => {
+  const relationship = await getActiveRelationship(userId);
+
+  const pinnedEvents =
+    await specialDateRepository.findPinnedByRelationship(
+      relationship._id
+    );
+
+  if (!pinnedEvents.length) {
+    return null;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingEvents = pinnedEvents.map((event) => {
+    const nextOccurrence = new Date(event.date);
+
+    nextOccurrence.setFullYear(today.getFullYear());
+
+    if (nextOccurrence < today) {
+      nextOccurrence.setFullYear(today.getFullYear() + 1);
+    }
+
+    const daysLeft = Math.ceil(
+      (nextOccurrence - today) / (1000 * 60 * 60 * 24)
+    );
+
+    return {
+      event,
+      daysLeft,
+    };
+  });
+
+  upcomingEvents.sort((a, b) => a.daysLeft - b.daysLeft);
+
+  return {
+    ...upcomingEvents[0].event.toObject(),
+    daysLeft: upcomingEvents[0].daysLeft,
+  };
+};
+
+
 module.exports = {
   createSpecialDate,
   getSpecialDates,
@@ -171,4 +232,7 @@ module.exports = {
   deleteSpecialDate,
   getUpcomingSpecialDates,
   getTodaySpecialDates,
+
+  togglePinSpecialDate,
+  getPinnedUpcomingEvent,
 };
