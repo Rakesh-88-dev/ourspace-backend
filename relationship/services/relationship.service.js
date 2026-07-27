@@ -327,14 +327,15 @@ async getRelationshipStatus(userId) {
     );
 
     return {
-      status: "connected",
-      relationship: {
-        _id: relationship._id,
-        relationshipKey: relationship.relationshipKey,
-        connectedAt: relationship.connectedAt,
-        partner,
-      },
-    };
+  status: "connected",
+  relationship: {
+    _id: relationship._id,
+    relationshipKey: relationship.relationshipKey,
+    anniversaryDate: relationship.anniversaryDate,
+    connectedAt: relationship.connectedAt,
+    partner,
+  },
+};
   }
 
   // Check pending invitation sent
@@ -382,13 +383,14 @@ async getRelationshipProfile(userId) {
   );
 
   return {
-    relationship: {
-      _id: relationship._id,
-      relationshipKey: relationship.relationshipKey,
-      connectedAt: relationship.connectedAt,
-      partner,
-    },
-  };
+  relationship: {
+    _id: relationship._id,
+    relationshipKey: relationship.relationshipKey,
+    anniversaryDate: relationship.anniversaryDate,
+    connectedAt: relationship.connectedAt,
+    partner,
+  },
+};
 }
 
 async disconnectRelationship(userId) {
