@@ -185,10 +185,14 @@ const togglePinSpecialDate = async (userId, specialDateId) => {
 const getPinnedUpcomingEvent = async (userId) => {
   const relationship = await getActiveRelationship(userId);
 
+  console.log("Relationship:", relationship._id);
+
   const pinnedEvents =
     await specialDateRepository.findPinnedByRelationship(
       relationship._id
     );
+
+  console.log("Pinned Events:", pinnedEvents);
 
   if (!pinnedEvents.length) {
     return null;
@@ -200,14 +204,17 @@ const getPinnedUpcomingEvent = async (userId) => {
   const upcomingEvents = pinnedEvents.map((event) => {
     const nextOccurrence = new Date(event.date);
 
-    nextOccurrence.setFullYear(today.getFullYear());
+    if (event.isRecurring) {
+      nextOccurrence.setFullYear(today.getFullYear());
 
-    if (nextOccurrence < today) {
-      nextOccurrence.setFullYear(today.getFullYear() + 1);
+      if (nextOccurrence < today) {
+        nextOccurrence.setFullYear(today.getFullYear() + 1);
+      }
     }
 
     const daysLeft = Math.ceil(
-      (nextOccurrence - today) / (1000 * 60 * 60 * 24)
+      (nextOccurrence - today) /
+      (1000 * 60 * 60 * 24)
     );
 
     return {

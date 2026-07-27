@@ -74,12 +74,11 @@ const togglePin = asyncHandler(async (req, res) => {
       req.params.id
     );
 
-  successResponse(
-    res,
-    200,
-    "Special date pin updated.",
-    specialDate
-  );
+  res.status(200).json({
+    success: true,
+    message: "Special date pin updated.",
+    data: specialDate,
+  });
 });
 
 const getPinnedUpcoming = asyncHandler(async (req, res) => {
@@ -88,12 +87,11 @@ const getPinnedUpcoming = asyncHandler(async (req, res) => {
       req.user._id
     );
 
-  successResponse(
-    res,
-    200,
-    "Pinned upcoming event fetched.",
-    event
-  );
+  res.status(200).json({
+    success: true,
+    message: "Pinned upcoming event fetched.",
+    data: event,
+  });
 });
 
 module.exports = {
