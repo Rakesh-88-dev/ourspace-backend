@@ -30,10 +30,7 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    relationshipId: {
-      type: String,
-      default: null,
-    },
+    
 
     lastSeen: {
   type: Date,
