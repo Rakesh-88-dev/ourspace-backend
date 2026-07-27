@@ -8,6 +8,8 @@ const {
   calculateEventData,
 } = require("../utils/dateCalculator");
 
+const EVENT_DEFAULTS = require("../utils/eventDefaults");
+
 const ForbiddenError = require("../../errors/ForbiddenError");
 const NotFoundError = require("../../errors/NotFoundError");
 
@@ -28,8 +30,21 @@ const getActiveRelationship = async (userId) => {
 const createSpecialDate = async (userId, data) => {
   const relationship = await getActiveRelationship(userId);
 
+  const defaults =
+    EVENT_DEFAULTS[data.type] ||
+    EVENT_DEFAULTS.Custom;
+
   return specialDateRepository.create({
     ...data,
+
+    occasionCategory:
+      data.occasionCategory ??
+      defaults.occasionCategory,
+
+    isRecurring:
+      data.isRecurring ??
+      defaults.isRecurring,
+
     relationship: relationship._id,
     createdBy: userId,
   });
