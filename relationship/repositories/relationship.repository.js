@@ -55,25 +55,19 @@ class RelationshipRepository {
   }
 
   // Used when a couple disconnects
-  async disconnectRelationship(
+  
+async disconnectRelationship(
+  relationshipId,
+  disconnectedBy,
+  session
+) {
+  return Relationship.findByIdAndDelete(
     relationshipId,
-    disconnectedBy,
-    session
-  ) {
-    return Relationship.findByIdAndUpdate(
-      relationshipId,
-      {
-        status: "disconnected",
-        disconnectedAt: new Date(),
-        disconnectedBy,
-      },
-      {
-        new: true,
-        session,
-      }
-    );
-  }
-
+    {
+      session,
+    }
+  );
+}
   // Keep this for admin use or permanent deletion
   async deleteRelationship(id) {
     return Relationship.findByIdAndDelete(id);
