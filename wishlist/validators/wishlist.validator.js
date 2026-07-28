@@ -7,18 +7,18 @@ const createWishlistValidation = [
     .withMessage("Title is required.")
     .isLength({ max: 100 })
     .withMessage("Title cannot exceed 100 characters."),
-
-  body("link")
-    .optional()
-    .trim()
-    .isURL()
-    .withMessage("Link must be a valid URL."),
+    
+body("link")
+  .optional({ values: "falsy" })
+  .trim()
+  .isURL()
+  .withMessage("Link must be a valid URL."),
 
   body("image")
-    .optional()
-    .trim()
-    .isURL()
-    .withMessage("Image must be a valid URL."),
+  .optional({ values: "falsy" })
+  .trim()
+  .isURL()
+  .withMessage("Image must be a valid URL."),
 
   body("category")
     .optional()
@@ -33,7 +33,7 @@ const updateWishlistValidation = [
     .trim()
     .isIn(["personal", "shared"])
     .withMessage("Space must be either 'personal' or 'shared'."),
-    
+
   body("title")
     .optional()
     .trim()
@@ -42,17 +42,17 @@ const updateWishlistValidation = [
     .isLength({ max: 100 })
     .withMessage("Title cannot exceed 100 characters."),
 
-  body("link")
-    .optional()
-    .trim()
-    .isURL()
-    .withMessage("Link must be a valid URL."),
+ body("link")
+  .optional({ values: "falsy" })
+  .trim()
+  .isURL()
+  .withMessage("Link must be a valid URL."),
 
   body("image")
-    .optional()
-    .trim()
-    .isURL()
-    .withMessage("Image must be a valid URL."),
+  .optional({ values: "falsy" })
+  .trim()
+  .isURL()
+  .withMessage("Image must be a valid URL."),
 
   body("category")
     .optional()
