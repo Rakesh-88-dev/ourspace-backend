@@ -12,6 +12,10 @@ const {
   memoryIdValidation,
 } = require("../validators/memory.validator");
 
+// ==========================================
+// Create Memory
+// ==========================================
+
 router.post(
   "/",
   protect,
@@ -20,17 +24,30 @@ router.post(
   memoryController.createMemory
 );
 
+// ==========================================
+// Get Memories
+// Query: ?space=shared | personal
+// ==========================================
+
 router.get(
   "/",
   protect,
   memoryController.getMemories
 );
 
+// ==========================================
+// On This Day
+// ==========================================
+
 router.get(
   "/on-this-day",
   protect,
   memoryController.getOnThisDay
 );
+
+// ==========================================
+// Update Memory
+// ==========================================
 
 router.put(
   "/:id",
@@ -41,6 +58,10 @@ router.put(
   memoryController.updateMemory
 );
 
+// ==========================================
+// Like / Unlike Memory
+// ==========================================
+
 router.put(
   "/:id/like",
   protect,
@@ -48,6 +69,10 @@ router.put(
   validate,
   memoryController.toggleLike
 );
+
+// ==========================================
+// Delete Memory (Soft Delete)
+// ==========================================
 
 router.delete(
   "/:id",

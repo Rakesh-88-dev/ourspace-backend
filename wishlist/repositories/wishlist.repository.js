@@ -65,6 +65,31 @@ class WishlistRepository {
   }
 
   // =============================
+// RETURN SHARED WISHLIST TO OWNERS
+// =============================
+
+async returnSharedWishlistToOwners(
+  relationshipId,
+  session
+) {
+  return Wishlist.updateMany(
+    {
+      relationship: relationshipId,
+      visibility: "shared",
+    },
+    {
+      $set: {
+        visibility: "personal",
+        relationship: null,
+      },
+    },
+    {
+      session,
+    }
+  );
+}
+
+  // =============================
   // SAVE
   // =============================
 

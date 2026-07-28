@@ -43,6 +43,19 @@ const relationshipSchema = new mongoose.Schema(
       immutable: true,
     },
 
+    // NEW
+    endedAt: {
+      type: Date,
+      default: null,
+    },
+
+    // NEW
+    endedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     lastActivityAt: {
       type: Date,
       default: Date.now,

@@ -5,8 +5,23 @@ class RelationshipRepository {
     return Relationship.create(data);
   }
 
+  async createRelationship(data, session) {
+    const [relationship] = await Relationship.create([data], {
+      session,
+    });
+
+    return relationship;
+  }
+
   async findById(id) {
     return Relationship.findById(id);
+  }
+
+  async findByIdWithUsers(id) {
+    return Relationship.findById(id).populate(
+      "members",
+      "name email avatar bio lastSeen createdAt"
+    );
   }
 
   async findByRelationshipKey(key) {
@@ -16,75 +31,72 @@ class RelationshipRepository {
   }
 
   async findByMember(userId) {
-  return Relationship.findOne({
-    members: userId,
-  }).populate(
-    "members",
-    "name email avatar bio lastSeen createdAt"
-  );
-}
+    return Relationship.findOne({
+      members: userId,
+      status: { $ne: "disconnected" }, // only active relationships
+    }).populate(
+      "members",
+      "name email avatar bio lastSeen createdAt"
+    );
+  }
+
+  async findActiveRelationship(userId) {
+    return this.findByMember(userId);
+  }
+
   async update(id, data) {
     return Relationship.findByIdAndUpdate(
       id,
       data,
-      { new: true }
+      {
+        new: true,
+      }
     );
   }
 
- async createRelationship(data, session) {
-  const [relationship] = await Relationship.create([data], {
-    session,
-  });
+  // Used when a couple disconnects
+  async disconnectRelationship(
+    relationshipId,
+    disconnectedBy,
+    session
+  ) {
+    return Relationship.findByIdAndUpdate(
+      relationshipId,
+      {
+        status: "disconnected",
+        disconnectedAt: new Date(),
+        disconnectedBy,
+      },
+      {
+        new: true,
+        session,
+      }
+    );
+  }
 
-  return relationship;
-}
+  // Keep this for admin use or permanent deletion
+  async deleteRelationship(id) {
+    return Relationship.findByIdAndDelete(id);
+  }
 
+  async exists(userId) {
+    return Relationship.exists({
+      members: userId,
+      status: { $ne: "disconnected" },
+    });
+  }
 
+  async getPartner(userId) {
+    const relationship =
+      await this.findActiveRelationship(userId);
 
-async deleteRelationship(id) {
-  return Relationship.findByIdAndDelete(id);
-}
+    if (!relationship) return null;
 
-async findActiveRelationship(userId) {
-  return Relationship.findOne({
-    members: userId,
-  }).populate(
-    "members",
-    "name email avatar bio lastSeen createdAt"
-  );
-}
-
-async exists(userId) {
-  return Relationship.exists({
-    members: userId,
-  });
-}
-
-async getPartner(userId) {
-  const relationship =
-    await this.findActiveRelationship(userId);
-
-  if (!relationship) return null;
-
-  return relationship.members.find(
-    member => member._id.toString() !== userId.toString()
-  );
-}
-async findActiveRelationship(userId) {
-  return this.findByMember(userId);
-}
-
-async findActiveRelationship(userId) {
-  return this.findByMember(userId);
-}
-
-async findByIdWithUsers(id) {
-  return Relationship.findById(id).populate(
-    "members",
-    "name email avatar bio lastSeen createdAt"
-  );
-}
-
+    return relationship.members.find(
+      (member) =>
+        member._id.toString() !== userId.toString()
+    );
+  }
 }
 
 module.exports = new RelationshipRepository();

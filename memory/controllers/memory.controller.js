@@ -2,6 +2,10 @@ const asyncHandler = require("../../middleware/asyncHandler");
 const memoryService = require("../services/memory.service");
 
 class MemoryController {
+  // ==========================================
+  // Create Memory
+  // ==========================================
+
   createMemory = asyncHandler(async (req, res) => {
     const memory = await memoryService.createMemory(
       req.user._id,
@@ -15,14 +19,42 @@ class MemoryController {
     });
   });
 
+  // ==========================================
+  // Get Memories
+  // ==========================================
+
   getMemories = asyncHandler(async (req, res) => {
-    const memories = await memoryService.getMemories(req.user._id);
+    const { space = "shared" } = req.query;
+
+    const memories = await memoryService.getMemories(
+      req.user._id,
+      space
+    );
 
     return res.status(200).json({
       success: true,
       data: memories,
     });
   });
+
+  // ==========================================
+  // Get On This Day Memories
+  // ==========================================
+
+  getOnThisDay = asyncHandler(async (req, res) => {
+    const memories = await memoryService.getOnThisDay(
+      req.user._id
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: memories,
+    });
+  });
+
+  // ==========================================
+  // Update Memory
+  // ==========================================
 
   updateMemory = asyncHandler(async (req, res) => {
     const memory = await memoryService.updateMemory(
@@ -38,6 +70,10 @@ class MemoryController {
     });
   });
 
+  // ==========================================
+  // Delete Memory
+  // ==========================================
+
   deleteMemory = asyncHandler(async (req, res) => {
     const result = await memoryService.deleteMemory(
       req.user._id,
@@ -50,6 +86,10 @@ class MemoryController {
     });
   });
 
+  // ==========================================
+  // Toggle Like
+  // ==========================================
+
   toggleLike = asyncHandler(async (req, res) => {
     const memory = await memoryService.toggleLike(
       req.user._id,
@@ -58,17 +98,8 @@ class MemoryController {
 
     return res.status(200).json({
       success: true,
-      message: "Memory updated successfully.",
+      message: "Memory like updated successfully.",
       data: memory,
-    });
-  });
-
-  getOnThisDay = asyncHandler(async (req, res) => {
-    const memories = await memoryService.getOnThisDay(req.user._id);
-
-    return res.status(200).json({
-      success: true,
-      data: memories,
     });
   });
 }

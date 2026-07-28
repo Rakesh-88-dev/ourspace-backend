@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const invitationRepository = require("../repositories/invitation.repository");
 const relationshipRepository = require("../repositories/relationship.repository");
 const userRepository = require("../repositories/user.repository");
+const memoryRepository = require("../../memory/repositories/memory.repository");
+const wishlistRepository = require("../../wishlist/repositories/wishlist.repository");
 
 const ForbiddenError = require("../../errors/ForbiddenError");
 const ConflictError = require("../../errors/ConflictError");
@@ -394,6 +396,11 @@ async getRelationshipProfile(userId) {
 }
 
 async disconnectRelationship(userId) {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
     // Find active relationship
     const relationship =
       await relationshipRepository.findByMember(userId);
@@ -404,16 +411,38 @@ async disconnectRelationship(userId) {
       );
     }
 
-    // Delete relationship
-    await relationshipRepository.deleteRelationship(
-      relationship._id
+    // Mark relationship as disconnected
+    await relationshipRepository.disconnectRelationship(
+      relationship._id,
+      userId,
+      session
     );
 
+    // Return shared memories to their owners
+    await memoryRepository.returnSharedMemoriesToOwners(
+      relationship._id,
+      session
+    );
+
+    // Return shared wishlist items (future)
+    await wishlistRepository.returnSharedWishlistToOwners(
+      relationship._id,
+      session
+    );
+
+    await session.commitTransaction();
+
     return {
-      message: "Relationship disconnected successfully.",
+      message: "Relationship disconnected successfully."
     };
+
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
 }
-
+}
 
 module.exports = new RelationshipService();
