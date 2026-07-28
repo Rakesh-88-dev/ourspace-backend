@@ -182,7 +182,10 @@ async moveMemory(id, data) {
     }
   )
     .populate("uploadedBy", "name email avatar")
-    .populate("relationship");
+    .populate(
+  "relationship",
+  "_id members status anniversaryDate"
+);
 }
 
 

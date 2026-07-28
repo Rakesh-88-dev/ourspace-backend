@@ -89,8 +89,8 @@ async createMemory(userId, data) {
   // Get Memories
   // ==========================================
 
-  async getMemories(userId, space = "shared") {
-      if (space === "personal") {
+  async getMemories(userId, space = "personal") {
+  if (space === "personal") {
     return memoryRepository.findPersonalMemories(userId);
   }
 
