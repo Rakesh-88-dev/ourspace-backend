@@ -65,13 +65,12 @@ async findPersonalMemories(userId) {
       .limit(limit);
   }
 
-  // ==========================================
-// On This Day
+ // ==========================================
+// On This Day (Personal + Shared)
 // ==========================================
 
-async findOnThisDay(relationshipId, month, day) {
+async findOnThisDay(userId, relationshipId, month, day) {
   return Memory.find({
-    relationship: relationshipId,
     isDeleted: false,
     $expr: {
       $and: [
@@ -93,11 +92,23 @@ async findOnThisDay(relationshipId, month, day) {
         },
       ],
     },
+    $or: [
+      {
+        space: "personal",
+        uploadedBy: userId,
+      },
+      ...(relationshipId
+        ? [
+            {
+              space: "shared",
+              relationship: relationshipId,
+            },
+          ]
+        : []),
+    ],
   })
-    .populate("uploadedBy", "name email avatar")
-    .sort({
-      memoryDate: -1,
-    });
+    .populate("uploadedBy", "name avatar")
+    .sort({ memoryDate: -1 });
 }
 
   // ==========================================
@@ -151,11 +162,30 @@ async findOnThisDay(relationshipId, month, day) {
   // ==========================================
 
   async update(id, data) {
-    return Memory.findByIdAndUpdate(id, data, {
+  return Memory.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  }).populate("uploadedBy", "name email avatar");
+}
+
+  // ==========================================
+// Move Memory
+// ==========================================
+
+async moveMemory(id, data) {
+  return Memory.findByIdAndUpdate(
+    id,
+    data,
+    {
       new: true,
       runValidators: true,
-    });
-  }
+    }
+  )
+    .populate("uploadedBy", "name email avatar")
+    .populate("relationship");
+}
+
+
 
   // ==========================================
   // Soft Delete

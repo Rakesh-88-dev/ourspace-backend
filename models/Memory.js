@@ -3,12 +3,11 @@ const mongoose = require("mongoose");
 const memorySchema = new mongoose.Schema(
   {
     relationship: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Relationship",
-      required: true,
-      index: true,
-    },
-
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Relationship",
+  default: null,
+  index: true,
+},
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

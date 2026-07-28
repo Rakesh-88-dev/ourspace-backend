@@ -59,6 +59,18 @@ router.put(
 );
 
 // ==========================================
+// Move Memory
+// ==========================================
+
+router.patch(
+  "/:id/move",
+  protect,
+  memoryIdValidation,
+  validate,
+  memoryController.moveMemory
+);
+
+// ==========================================
 // Like / Unlike Memory
 // ==========================================
 

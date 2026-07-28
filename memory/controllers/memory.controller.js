@@ -71,6 +71,24 @@ class MemoryController {
   });
 
   // ==========================================
+// Move Memory
+// ==========================================
+
+moveMemory = asyncHandler(async (req, res) => {
+  const memory = await memoryService.moveMemory(
+    req.user._id,
+    req.params.id,
+    req.body.space
+  );
+
+  return res.status(200).json({
+    success: true,
+    message: `Memory moved to ${req.body.space} successfully.`,
+    data: memory,
+  });
+});
+
+  // ==========================================
   // Delete Memory
   // ==========================================
 

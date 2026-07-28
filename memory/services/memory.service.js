@@ -22,41 +22,75 @@ class MemoryService {
     return relationship;
   }
 
+
   // ==========================================
-  // Create Memory
-  // ==========================================
+// Validate Memory Access
+// ==========================================
 
-  async createMemory(userId, data) {
-    const relationship =
-      await this.getActiveRelationship(userId);
+async validateMemoryAccess(userId, memory) {
+  if (memory.space === "personal") {
+    if (
+      memory.uploadedBy._id.toString() !==
+      userId.toString()
+    ) {
+      throw new ForbiddenError(
+        "You are not allowed to access this memory."
+      );
+    }
 
-    return memoryRepository.create({
-      relationship: relationship._id,
-      uploadedBy: userId,
-
-      space: data.space || "shared",
-
-      title: data.title,
-
-      media: {
-        url: data.media.url,
-        type: data.media.type || "image",
-      },
-
-      caption: data.caption,
-      location: data.location,
-      tags: data.tags || [],
-      memoryDate: data.memoryDate,
-    });
+    return;
   }
 
+  const relationship =
+    await this.getActiveRelationship(userId);
+
+  if (
+    !memory.relationship ||
+    memory.relationship.toString() !==
+      relationship._id.toString()
+  ) {
+    throw new ForbiddenError(
+      "You are not allowed to access this memory."
+    );
+  }
+}
+
+ // ==========================================
+// Create Memory
+// ==========================================
+
+async createMemory(userId, data) {
+  let relationship = null;
+
+  if (data.space === "shared") {
+    relationship = await this.getActiveRelationship(userId);
+  }
+
+  return memoryRepository.create({
+    relationship: relationship ? relationship._id : null,
+    uploadedBy: userId,
+
+    space: data.space || "personal",
+
+    title: data.title,
+
+    media: {
+      url: data.media.url,
+      type: data.media.type || "image",
+    },
+
+    caption: data.caption,
+    location: data.location,
+    tags: data.tags || [],
+    memoryDate: data.memoryDate,
+  });
+}
   // ==========================================
   // Get Memories
   // ==========================================
 
   async getMemories(userId, space = "shared") {
-
-  if (space === "personal") {
+      if (space === "personal") {
     return memoryRepository.findPersonalMemories(userId);
   }
 
@@ -74,28 +108,17 @@ class MemoryService {
   // ==========================================
 
   async updateMemory(userId, memoryId, data) {
-    const relationship =
-      await this.getActiveRelationship(userId);
-
     const memory =
-      await memoryRepository.findById(memoryId);
+  await memoryRepository.findById(memoryId);
 
-    if (!memory) {
-      throw new NotFoundError("Memory not found.");
-    }
+if (!memory) {
+  throw new NotFoundError("Memory not found.");
+}
 
-    if (
-      memory.relationship.toString() !==
-      relationship._id.toString()
-    ) {
-      throw new ForbiddenError(
-        "You are not allowed to update this memory."
-      );
-    }
+await this.validateMemoryAccess(userId, memory);
 
     return memoryRepository.update(memoryId, {
-      space: data.space,
-
+      
       title: data.title,
 
       media: data.media
@@ -113,29 +136,59 @@ class MemoryService {
     });
   }
 
+ // ==========================================
+// Move Memory
+// ==========================================
+
+async moveMemory(userId, memoryId, space) {
+  const memory = await memoryRepository.findById(memoryId);
+
+  if (!memory) {
+    throw new NotFoundError("Memory not found.");
+  }
+
+  await this.validateMemoryAccess(userId, memory);
+
+  if (!["personal", "shared"].includes(space)) {
+    throw new ForbiddenError("Invalid memory space.");
+  }
+
+  if (space === memory.space) {
+    return memory;
+  }
+
+  // Move to Shared
+  if (space === "shared") {
+    const relationship =
+      await this.getActiveRelationship(userId);
+
+    return memoryRepository.moveMemory(memoryId, {
+      space: "shared",
+      relationship: relationship._id,
+    });
+  }
+
+  // Move to Personal
+  return memoryRepository.moveMemory(memoryId, {
+    space: "personal",
+    relationship: null,
+  });
+}
+
+
   // ==========================================
   // Delete Memory
   // ==========================================
 
   async deleteMemory(userId, memoryId) {
-    const relationship =
-      await this.getActiveRelationship(userId);
-
     const memory =
-      await memoryRepository.findById(memoryId);
+  await memoryRepository.findById(memoryId);
 
-    if (!memory) {
-      throw new NotFoundError("Memory not found.");
-    }
+if (!memory) {
+  throw new NotFoundError("Memory not found.");
+}
 
-    if (
-      memory.relationship.toString() !==
-      relationship._id.toString()
-    ) {
-      throw new ForbiddenError(
-        "You are not allowed to delete this memory."
-      );
-    }
+await this.validateMemoryAccess(userId, memory);
 
     await memoryRepository.softDelete(memoryId);
 
@@ -149,24 +202,15 @@ class MemoryService {
   // ==========================================
 
   async toggleLike(userId, memoryId) {
-    const relationship =
-      await this.getActiveRelationship(userId);
-
     const memory =
-      await memoryRepository.findById(memoryId);
+  await memoryRepository.findById(memoryId);
 
-    if (!memory) {
-      throw new NotFoundError("Memory not found.");
-    }
+if (!memory) {
+  throw new NotFoundError("Memory not found.");
+}
 
-    if (
-      memory.relationship.toString() !==
-      relationship._id.toString()
-    ) {
-      throw new ForbiddenError(
-        "You are not allowed to like this memory."
-      );
-    }
+await this.validateMemoryAccess(userId, memory);
+
 
     const alreadyLiked = memory.likes.some(
       (id) => id.toString() === userId.toString()
@@ -183,22 +227,23 @@ class MemoryService {
     return memoryRepository.save(memory);
   }
 
-  // ==========================================
-  // On This Day
-  // ==========================================
+  /// ==========================================
+// On This Day
+// ==========================================
 
-  async getOnThisDay(userId) {
-    const relationship =
-      await this.getActiveRelationship(userId);
+async getOnThisDay(userId) {
+  const today = new Date();
 
-    const today = new Date();
+  const relationship =
+    await relationshipRepository.findActiveRelationship(userId);
 
-    return memoryRepository.findOnThisDay(
-      relationship._id,
-      today.getMonth() + 1,
-      today.getDate()
-    );
-  }
+  return memoryRepository.findOnThisDay(
+    userId,
+    relationship ? relationship._id : null,
+    today.getMonth() + 1,
+    today.getDate()
+  );
+}
 
 
 }
