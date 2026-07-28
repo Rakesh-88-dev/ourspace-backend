@@ -14,7 +14,36 @@ const {
 
 const router = express.Router();
 
+// ==========================================
+// Get Current Space Wishlist
+// ==========================================
+router.get(
+  "/",
+  protect,
+  wishlistController.getWishlist
+);
+
+// ==========================================
+// Get Personal Wishlist
+// ==========================================
+router.get(
+  "/personal",
+  protect,
+  wishlistController.getPersonalWishlist
+);
+
+// ==========================================
+// Get Shared Wishlist
+// ==========================================
+router.get(
+  "/shared",
+  protect,
+  wishlistController.getSharedWishlist
+);
+
+// ==========================================
 // Create Wishlist Item
+// ==========================================
 router.post(
   "/",
   protect,
@@ -23,14 +52,20 @@ router.post(
   wishlistController.createWishlist
 );
 
-// Get All Wishlist Items
-router.get(
-  "/",
+// ==========================================
+// Share Personal Wishlist Item
+// ==========================================
+router.post(
+  "/:id/share",
   protect,
-  wishlistController.getWishlist
+  wishlistIdValidation,
+  validate,
+  wishlistController.shareWishlist
 );
 
+// ==========================================
 // Update Wishlist Item
+// ==========================================
 router.put(
   "/:id",
   protect,
@@ -40,7 +75,9 @@ router.put(
   wishlistController.updateWishlist
 );
 
+// ==========================================
 // Toggle Bought Status
+// ==========================================
 router.put(
   "/:id/bought",
   protect,
@@ -49,7 +86,9 @@ router.put(
   wishlistController.toggleBought
 );
 
+// ==========================================
 // React to Wishlist Item
+// ==========================================
 router.put(
   "/:id/reaction",
   protect,
@@ -59,7 +98,9 @@ router.put(
   wishlistController.toggleReaction
 );
 
+// ==========================================
 // Delete Wishlist Item
+// ==========================================
 router.delete(
   "/:id",
   protect,

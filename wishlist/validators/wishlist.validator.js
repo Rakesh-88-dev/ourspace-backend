@@ -28,6 +28,12 @@ const createWishlistValidation = [
 ];
 
 const updateWishlistValidation = [
+  body("space")
+    .optional()
+    .trim()
+    .isIn(["personal", "shared"])
+    .withMessage("Space must be either 'personal' or 'shared'."),
+    
   body("title")
     .optional()
     .trim()
