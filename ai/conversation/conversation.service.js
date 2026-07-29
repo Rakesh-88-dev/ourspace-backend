@@ -40,41 +40,40 @@ const processConversation = async ({
   }
 
   // Save user message
-  await ConversationRepository.saveUserMessage({
+  console.log("1. Conversation ready");
+
+await ConversationRepository.saveUserMessage({
+  conversationId: conversation._id,
+  prompt,
+});
+
+console.log("2. User message saved");
+
+await ConversationRepository.updateConversationCache({
+  conversationId: conversation._id,
+  lastMessage: prompt,
+});
+
+console.log("3. Cache updated");
+
+const history =
+  await ConversationRepository.loadConversationHistory({
     conversationId: conversation._id,
-    prompt,
   });
 
-  // Update conversation cache
-  await ConversationRepository.updateConversationCache({
-    conversationId: conversation._id,
-    lastMessage: prompt,
-  });
+console.log("4. History loaded");
 
-  // Load conversation history
-  const history =
-    await ConversationRepository.loadConversationHistory({
-      conversationId: conversation._id,
-    });
-
-  // Convert history into AI messages
-  const aiHistory = mapHistoryForAI(history);
-
-  // Load long-term memory context
-  const {
+const {
   context: memoryContext,
   keys: memoryKeys,
 } = await buildMemoryContext({
   user: userId,
 });
 
-const aiMessages = [...aiHistory];
+console.log("5. Memory context built");
 
-
-
- // Generate AI response
 const response = await generateResponse({
-  messages: aiMessages,
+  messages: aiHistory,
   memoryContext,
   context: {
     userId,
@@ -82,22 +81,21 @@ const response = await generateResponse({
   },
 });
 
-// Generate title for new conversations
-if (
-  conversation.title === "New Chat" &&
-  response.title?.trim()
-) {
-  await ConversationRepository.updateConversationTitle({
-    conversationId: conversation._id,
-    title: response.title.trim(),
-  });
-}
+console.log("6. AI response received", response);
 
-// Save assistant reply
 await ConversationRepository.saveAssistantMessage({
   conversationId: conversation._id,
   reply: response.reply,
 });
+
+console.log("7. Assistant message saved");
+
+await markMemoriesUsed({
+  user: userId,
+  keys: memoryKeys,
+});
+
+console.log("8. Memories marked");
 
 // Update conversation cache
 await ConversationRepository.updateConversationCache({
