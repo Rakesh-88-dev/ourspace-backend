@@ -17,9 +17,9 @@ const TOOL_TYPES = Object.freeze({
   UPDATE_SPECIAL_DATE: "update_special_date",
   DELETE_SPECIAL_DATE: "delete_special_date",
 
-
   // Profile
   UPDATE_PROFILE: "update_profile",
+  GET_PROFILE: "get_profile",
 
   // Future
   CREATE_EVENT: "create_event",
