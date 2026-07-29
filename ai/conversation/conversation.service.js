@@ -56,13 +56,16 @@ await ConversationRepository.updateConversationCache({
 
 console.log("3. Cache updated");
 
+// Load conversation history
 const history =
   await ConversationRepository.loadConversationHistory({
     conversationId: conversation._id,
   });
 
-console.log("4. History loaded");
+// Convert history into AI messages
+const aiMessages = mapHistoryForAI(history);
 
+// Load long-term memory context
 const {
   context: memoryContext,
   keys: memoryKeys,
@@ -73,7 +76,7 @@ const {
 console.log("5. Memory context built");
 
 const response = await generateResponse({
-  messages: aiHistory,
+  messages: aiMessages,
   memoryContext,
   context: {
     userId,
@@ -104,10 +107,7 @@ await ConversationRepository.updateConversationCache({
 });
 
 // Mark memories as used
-await markMemoriesUsed({
-  user: userId,
-  keys: memoryKeys,
-});
+
 
 // Return response
 return {
