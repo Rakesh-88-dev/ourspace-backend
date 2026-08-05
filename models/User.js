@@ -51,6 +51,12 @@ isDemo: {
       default: "",
     },
 
+    relationshipStatus: {
+  type: String,
+  enum: ["single", "relationship"],
+  default: "single",
+},
+
     lastSeen: {
       type: Date,
       default: Date.now,

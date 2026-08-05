@@ -19,14 +19,19 @@ exports.registerUser = async (req, res) => {
     console.log("Parsed:", name, email, password); // 👈 IMPORTANT
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Please fill all fields" });
-    }
-
+  return res.status(400).json({
+    success: false,
+    message: "Please fill all fields",
+  });
+}
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+  return res.status(400).json({
+    success: false,
+    message: "User already exists",
+  });
+}
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -37,16 +42,36 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    });
+   res.status(201).json({
+  success: true,
+  message: "Registration successful.",
+
+  token: generateToken(user._id),
+
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+
+    bio: user.bio,
+    profession: user.profession,
+    location: user.location,
+
+    relationshipStatus: user.relationshipStatus,
+
+    onboardingCompleted: user.onboardingCompleted,
+
+    isDemo: user.isDemo,
+  },
+});
 
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+  success: false,
+  message: error.message,
+});
   }
 };
 
@@ -61,10 +86,11 @@ exports.loginUser = async (req, res) => {
     console.log("INPUT PASSWORD:", password);
 
     if (!user) {
-      return res.status(401).json({
-        message: "User not found",
-      });
-    }
+  return res.status(401).json({
+    success: false,
+    message: "User not found",
+  });
+}
 
     const isMatch = await bcrypt.compare(password, user.password);
     console.log("PASSWORD MATCH:", isMatch);
@@ -75,21 +101,43 @@ exports.loginUser = async (req, res) => {
         await user.save();
 
       return res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-        
-      });
+  success: true,
+  message: "Login successful.",
+
+  token: generateToken(user._id),
+
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+
+    avatar: user.avatar,
+
+    bio: user.bio,
+    profession: user.profession,
+    location: user.location,
+
+    relationshipStatus: user.relationshipStatus,
+
+    onboardingCompleted: user.onboardingCompleted,
+
+    isDemo: user.isDemo,
+  },
+});
+
     } else {
-      return res.status(401).json({
-        message: "Invalid password",
-      });
+     return res.status(401).json({
+  success: false,
+  message: "Invalid password",
+});
     }
 
   } catch (error) {
     console.error("LOGIN ERROR:", error);
-    res.status(500).json({ message: error.message });
+   res.status(500).json({
+  success: false,
+  message: error.message,
+});
   }
 };
 
@@ -108,22 +156,29 @@ exports.demoLogin = async (req, res) => {
     await user.save();
 
     return res.json({
-      success: true,
+  success: true,
+  message: "Demo login successful.",
 
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+  token: generateToken(user._id),
 
-      avatar: user.avatar,
-      profession: user.profession,
-      bio: user.bio,
-      location: user.location,
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
 
-      onboardingCompleted: user.onboardingCompleted,
-      isDemo: true,
+    avatar: user.avatar,
 
-      token: generateToken(user._id),
-    });
+    bio: user.bio,
+    profession: user.profession,
+    location: user.location,
+
+    relationshipStatus: user.relationshipStatus,
+
+    onboardingCompleted: user.onboardingCompleted,
+
+    isDemo: true,
+  },
+});
 
   } catch (err) {
     console.error(err);
@@ -136,7 +191,10 @@ exports.demoLogin = async (req, res) => {
 };
 
 exports.getUserProfile = async (req, res) => {
-  res.json(req.user);
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
 };
 
 exports.createMemory = async (req, res) => {

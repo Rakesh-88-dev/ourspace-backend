@@ -1,32 +1,75 @@
 const User = require("../models/User");
 
+// ==========================================
 // GET /api/users/me
+// ==========================================
+
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
+
     res.json(user);
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+
   }
 };
 
+// ==========================================
 // PUT /api/users/me
+// ==========================================
+
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, profession, bio, location } = req.body;
+
+    const {
+      name,
+      profession,
+      bio,
+      location,
+      relationshipStatus,
+      onboardingCompleted,
+    } = req.body;
 
     const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({
+        success: false,
         message: "User not found",
       });
     }
 
-    user.name = name ?? user.name;
-    user.profession = profession ?? user.profession;
-    user.bio = bio ?? user.bio;
-    user.location = location ?? user.location;
+    // Profile
+
+    if (name !== undefined)
+      user.name = name;
+
+    if (profession !== undefined)
+      user.profession = profession;
+
+    if (bio !== undefined)
+      user.bio = bio;
+
+    if (location !== undefined)
+      user.location = location;
+
+    // Relationship
+
+    if (relationshipStatus !== undefined)
+      user.relationshipStatus = relationshipStatus;
+
+    // Onboarding
+
+    if (onboardingCompleted !== undefined)
+      user.onboardingCompleted = onboardingCompleted;
+
+    // Avatar
 
     if (req.file) {
       user.avatar = req.file.path;
@@ -41,12 +84,15 @@ exports.updateProfile = async (req, res) => {
       message: "Profile updated successfully.",
       user: updatedUser,
     });
+
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
       success: false,
       message: err.message,
     });
+
   }
 };
