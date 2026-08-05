@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -9,69 +11,100 @@ const generateToken = (id) => {
 };
 
 exports.registerUser = async (req, res) => {
-  console.log("BODY:", req.body);
-
   try {
-    const name = req.body?.name;
-    const email = req.body?.email;
-    const password = req.body?.password;
+    const { name, email, password } = req.body;
 
-    console.log("Parsed:", name, email, password); // 👈 IMPORTANT
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
 
     if (!name || !email || !password) {
-  return res.status(400).json({
-    success: false,
-    message: "Please fill all fields",
-  });
-}
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all fields",
+      });
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-  return res.status(400).json({
-    success: false,
-    message: "User already exists",
-  });
-}
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    let avatar = "";
+
+    // Upload avatar if provided
+
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "ourspace_avatars",
+          },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+
+            resolve(result);
+          }
+        );
+
+        streamifier
+          .createReadStream(req.file.buffer)
+          .pipe(stream);
+      });
+
+      avatar = result.secure_url;
+    }
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      avatar,
     });
 
-   res.status(201).json({
-  success: true,
-  message: "Registration successful.",
+    res.status(201).json({
+      success: true,
+      message: "Registration successful.",
 
-  token: generateToken(user._id),
+      token: generateToken(user._id),
 
-  user: {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
 
-    bio: user.bio,
-    profession: user.profession,
-    location: user.location,
+        avatar: user.avatar,
 
-    relationshipStatus: user.relationshipStatus,
+        bio: user.bio,
+        profession: user.profession,
+        location: user.location,
 
-    onboardingCompleted: user.onboardingCompleted,
+        relationshipStatus: user.relationshipStatus,
 
-    isDemo: user.isDemo,
-  },
-});
+        onboardingCompleted:
+          user.onboardingCompleted,
+
+        isDemo: user.isDemo,
+      },
+    });
 
   } catch (error) {
-    console.error("REGISTER ERROR:", error);
+
+    console.error(error);
+
     res.status(500).json({
-  success: false,
-  message: error.message,
-});
+      success: false,
+      message: error.message,
+    });
+
   }
 };
 
