@@ -24,7 +24,7 @@ class MemoryController {
   // ==========================================
 
   getMemories = asyncHandler(async (req, res) => {
-    const { space = "shared" } = req.query;
+    const { space = "personal" } = req.query;
 
     const memories = await memoryService.getMemories(
       req.user._id,

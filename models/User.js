@@ -24,20 +24,28 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    // ✅ ADD THIS (important)
     bio: {
       type: String,
       default: "",
     },
 
-    
+    // NEW
+    profession: {
+      type: String,
+      default: "",
+    },
+
+    // NEW
+    location: {
+      type: String,
+      default: "",
+    },
 
     lastSeen: {
-  type: Date,
-  default: Date.now,
-},
+      type: Date,
+      default: Date.now,
+    },
 
-    // 💖 Special Dates
     specialDates: [
       {
         title: {

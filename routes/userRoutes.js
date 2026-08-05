@@ -36,9 +36,10 @@ router.put("/me", protect, upload.single("avatar"), async (req, res) => {
     }
 
     // update text fields
-    if (req.body.name) user.name = req.body.name;
-    if (req.body.bio) user.bio = req.body.bio;
-
+    user.name = req.body.name ?? user.name;
+user.bio = req.body.bio ?? user.bio;
+user.profession = req.body.profession ?? user.profession;
+user.location = req.body.location ?? user.location;
     // 🔥 Upload avatar to Cloudinary
     if (req.file) {
       const stream = cloudinary.uploader.upload_stream(
@@ -51,7 +52,11 @@ router.put("/me", protect, upload.single("avatar"), async (req, res) => {
           user.avatar = result.secure_url;
           await user.save();
 
-          return res.json(user);
+         res.status(200).json({
+    success: true,
+    message: "Profile updated successfully.",
+    user,
+});
         }
       );
 
@@ -60,7 +65,11 @@ router.put("/me", protect, upload.single("avatar"), async (req, res) => {
     }
 
     await user.save();
-    res.json(user);
+    res.status(200).json({
+    success: true,
+    message: "Profile updated successfully.",
+    user,
+});
 
   } catch (err) {
     res.status(500).json({ message: err.message });

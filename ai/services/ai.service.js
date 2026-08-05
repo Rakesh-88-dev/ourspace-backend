@@ -18,7 +18,11 @@ const AppError = require("../utils/AppError");
 
 /**
  * Generate conversational AI response.
+ * 
+ * 
  */
+
+
 const generateResponse = async ({
   messages,
   provider = "gemini",
