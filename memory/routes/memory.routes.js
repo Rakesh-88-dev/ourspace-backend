@@ -4,6 +4,9 @@ const router = express.Router();
 const protect = require("../../middleware/authMiddleware");
 const validate = require("../../middleware/validate");
 
+// ✅ Demo Guard
+const demoGuard = require("../../demo/middleware/demoGuard");
+
 const memoryController = require("../controllers/memory.controller");
 
 const {
@@ -19,6 +22,7 @@ const {
 router.post(
   "/",
   protect,
+  demoGuard,
   createMemoryValidation,
   validate,
   memoryController.createMemory
@@ -52,6 +56,7 @@ router.get(
 router.put(
   "/:id",
   protect,
+  demoGuard,
   memoryIdValidation,
   updateMemoryValidation,
   validate,
@@ -65,6 +70,7 @@ router.put(
 router.patch(
   "/:id/move",
   protect,
+  demoGuard,
   memoryIdValidation,
   validate,
   memoryController.moveMemory
@@ -77,6 +83,7 @@ router.patch(
 router.put(
   "/:id/like",
   protect,
+  demoGuard,
   memoryIdValidation,
   validate,
   memoryController.toggleLike
@@ -89,6 +96,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
+  demoGuard,
   memoryIdValidation,
   validate,
   memoryController.deleteMemory

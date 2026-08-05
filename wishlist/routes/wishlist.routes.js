@@ -5,6 +5,9 @@ const wishlistController = require("../controllers/wishlist.controller");
 const protect = require("../../middleware/authMiddleware");
 const validate = require("../../middleware/validate");
 
+// ✅ Demo Guard
+const demoGuard = require("../../demo/middleware/demoGuard");
+
 const {
   createWishlistValidation,
   updateWishlistValidation,
@@ -47,6 +50,7 @@ router.get(
 router.post(
   "/",
   protect,
+  demoGuard,
   createWishlistValidation,
   validate,
   wishlistController.createWishlist
@@ -58,6 +62,7 @@ router.post(
 router.post(
   "/:id/share",
   protect,
+  demoGuard,
   wishlistIdValidation,
   validate,
   wishlistController.shareWishlist
@@ -69,6 +74,7 @@ router.post(
 router.put(
   "/:id",
   protect,
+  demoGuard,
   wishlistIdValidation,
   updateWishlistValidation,
   validate,
@@ -81,6 +87,7 @@ router.put(
 router.put(
   "/:id/bought",
   protect,
+  demoGuard,
   wishlistIdValidation,
   validate,
   wishlistController.toggleBought
@@ -92,6 +99,7 @@ router.put(
 router.put(
   "/:id/reaction",
   protect,
+  demoGuard,
   wishlistIdValidation,
   reactionValidation,
   validate,
@@ -104,6 +112,7 @@ router.put(
 router.delete(
   "/:id",
   protect,
+  demoGuard,
   wishlistIdValidation,
   validate,
   wishlistController.deleteWishlist

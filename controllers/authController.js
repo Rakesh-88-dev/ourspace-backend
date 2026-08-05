@@ -93,6 +93,48 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+exports.demoLogin = async (req, res) => {
+  try {
+    const user = await User.findOne({ isDemo: true });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Demo account not found.",
+      });
+    }
+
+    user.lastSeen = new Date();
+    await user.save();
+
+    return res.json({
+      success: true,
+
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+
+      avatar: user.avatar,
+      profession: user.profession,
+      bio: user.bio,
+      location: user.location,
+
+      onboardingCompleted: user.onboardingCompleted,
+      isDemo: true,
+
+      token: generateToken(user._id),
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 exports.getUserProfile = async (req, res) => {
   res.json(req.user);
 };

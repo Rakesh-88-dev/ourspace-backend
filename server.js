@@ -17,6 +17,7 @@ const statsRoutes = require("./routes/statsRoutes");
 const aiRoutes = require("./routes/ai.routes");
 const User = require("./models/User");
 const spaceRoutes = require("./space/routes/space.routes");
+const demoRoutes = require("./demo/routes/demo.routes");
 const http = require("http");
 const { Server } = require("socket.io");
 const relationshipRoutes = require("./relationship/routes/relationship.routes");
@@ -48,6 +49,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/relationship", relationshipRoutes);
+app.use("/api/demo", demoRoutes);
 app.use("/api/space", spaceRoutes);
 
 

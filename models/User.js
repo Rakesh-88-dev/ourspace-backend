@@ -29,6 +29,16 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+    onboardingCompleted: {
+  type: Boolean,
+  default: false,
+},
+
+isDemo: {
+  type: Boolean,
+  default: false,
+},
+
     // NEW
     profession: {
       type: String,
