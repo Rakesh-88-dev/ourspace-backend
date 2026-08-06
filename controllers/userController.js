@@ -71,9 +71,36 @@ exports.updateProfile = async (req, res) => {
 
     // Avatar
 
-    if (req.file) {
-      user.avatar = req.file.path;
-    }
+if (req.file) {
+
+  const cloudinary = require("../config/cloudinary");
+  const streamifier = require("streamifier");
+
+  const uploadToCloudinary = () =>
+    new Promise((resolve, reject) => {
+
+      const stream =
+        cloudinary.uploader.upload_stream(
+          {
+            folder: "ourspace/profile",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+      streamifier
+        .createReadStream(req.file.buffer)
+        .pipe(stream);
+
+    });
+
+  const result = await uploadToCloudinary();
+
+  user.avatar = result.secure_url;
+}
 
     await user.save();
 
