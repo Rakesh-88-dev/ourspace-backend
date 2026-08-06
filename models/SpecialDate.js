@@ -56,6 +56,23 @@ note: {
   default: "",
 },
 
+coverImage: {
+  type: String,
+  default: "",
+},
+
+gallery: [
+  {
+    type: String,
+  },
+],
+
+location: {
+  type: String,
+  trim: true,
+  default: "",
+},
+
 isPinned: {
   type: Boolean,
   default: false,

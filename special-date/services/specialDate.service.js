@@ -9,6 +9,8 @@ const {
 } = require("../utils/dateCalculator");
 
 const EVENT_DEFAULTS = require("../utils/eventDefaults");
+const cloudinary = require("../../config/cloudinary");
+const streamifier = require("streamifier");
 
 const ForbiddenError = require("../../errors/ForbiddenError");
 const NotFoundError = require("../../errors/NotFoundError");
@@ -27,15 +29,51 @@ const getActiveRelationship = async (userId) => {
   return relationship;
 };
 
-const createSpecialDate = async (userId, data) => {
-  const relationship = await getActiveRelationship(userId);
+const createSpecialDate = async (
+  userId,
+  data,
+  file
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
 
   const defaults =
     EVENT_DEFAULTS[data.type] ||
     EVENT_DEFAULTS.Custom;
 
+  let coverImage = "";
+
+  if (file) {
+
+    const result = await new Promise(
+      (resolve, reject) => {
+
+        const stream =
+          cloudinary.uploader.upload_stream(
+            {
+              folder: "ourspace/special-dates",
+              resource_type: "image",
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+
+        streamifier
+          .createReadStream(file.buffer)
+          .pipe(stream);
+
+      }
+    );
+
+    coverImage = result.secure_url;
+  }
+
   return specialDateRepository.create({
     ...data,
+
+    coverImage,
 
     occasionCategory:
       data.occasionCategory ??
@@ -46,6 +84,7 @@ const createSpecialDate = async (userId, data) => {
       defaults.isRecurring,
 
     relationship: relationship._id,
+
     createdBy: userId,
   });
 };
