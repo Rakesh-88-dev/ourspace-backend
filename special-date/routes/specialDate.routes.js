@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const protect = require("../../middleware/authMiddleware");
+const upload = require("../../middleware/uploadMiddleware");
 const validate = require("../../middleware/validate");
 
 // ✅ Demo Guard
@@ -23,6 +24,7 @@ router.post(
   "/",
   protect,
   demoGuard,
+  upload.single("coverImage"), // Optional Image
   createSpecialDateValidation,
   validate,
   specialDateController.createSpecialDate
@@ -46,6 +48,7 @@ router.put(
   "/:id",
   protect,
   demoGuard,
+  upload.single("coverImage"), // Optional Image
   specialDateIdValidation,
   updateSpecialDateValidation,
   validate,
