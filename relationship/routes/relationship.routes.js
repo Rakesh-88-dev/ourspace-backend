@@ -97,6 +97,12 @@ router.get(
   relationshipController.getRelationshipProfile
 );
 
+router.get(
+  "/achievements",
+  authMiddleware,
+  relationshipController.getAchievements
+);
+
 // ==========================================
 // Disconnect Relationship
 // ==========================================

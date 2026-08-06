@@ -6,6 +6,8 @@ const relationshipRepository = require("../repositories/relationship.repository"
 const userRepository = require("../repositories/user.repository");
 const memoryRepository = require("../../memory/repositories/memory.repository");
 const wishlistRepository = require("../../wishlist/repositories/wishlist.repository");
+const Message = require("../../models/Message");
+const SpecialDate = require("../../models/SpecialDate");
 
 const ForbiddenError = require("../../errors/ForbiddenError");
 const ConflictError = require("../../errors/ConflictError");
@@ -393,6 +395,129 @@ async getRelationshipProfile(userId) {
     partner,
   },
 };
+}
+
+async getAchievements(userId) {
+  const relationship =
+    await relationshipRepository.findByMember(
+      userId
+    );
+
+  if (!relationship) {
+    throw new NotFoundError(
+      "No active relationship found."
+    );
+  }
+
+  const memories =
+    await memoryRepository.countSharedMemories(
+      relationship._id
+    );
+
+  const wishlist =
+    await wishlistRepository.countSharedWishlist(
+      relationship._id
+    );
+
+  const completedWishlist =
+    await wishlistRepository.countCompletedSharedWishlist(
+      relationship._id
+    );
+
+  // Messages
+  const [userOne, userTwo] = relationship.members;
+
+  const messages = await Message.countDocuments({
+    $or: [
+      {
+        senderId: userOne,
+        receiverId: userTwo,
+      },
+      {
+        senderId: userTwo,
+        receiverId: userOne,
+      },
+    ],
+    deleted: false,
+  });
+
+  // Special Dates
+  const dates = await SpecialDate.countDocuments({
+    relationship: relationship._id,
+  });
+
+  const daysTogether = Math.floor(
+    (Date.now() -
+      new Date(
+        relationship.anniversaryDate
+      )) /
+      (1000 * 60 * 60 * 24)
+  );
+
+  const achievements = [
+    {
+      id: 1,
+      title: "Connected ❤️",
+      unlocked: true,
+    },
+    {
+      id: 2,
+      title: "First Memory",
+      unlocked: memories >= 1,
+    },
+    {
+      id: 3,
+      title: "Memory Collector",
+      unlocked: memories >= 10,
+    },
+    {
+      id: 4,
+      title: "100 Days Together",
+      unlocked: daysTogether >= 100,
+    },
+    {
+      id: 5,
+      title: "One Year Together",
+      unlocked: daysTogether >= 365,
+    },
+    {
+      id: 6,
+      title: "First Conversation",
+      unlocked: messages >= 1,
+    },
+    {
+      id: 7,
+      title: "Talkative Couple",
+      unlocked: messages >= 1000,
+    },
+    {
+      id: 8,
+      title: "First Dream",
+      unlocked: wishlist >= 1,
+    },
+    {
+      id: 9,
+      title: "Dream Chaser",
+      unlocked: completedWishlist >= 5,
+    },
+    {
+      id: 10,
+      title: "Celebration Master",
+      unlocked: dates >= 5,
+    },
+  ];
+
+  return {
+    stats: {
+      daysTogether,
+      memories,
+      messages,
+      wishlist,
+      completedWishlist,
+      dates,
+    },
+    achievements,
+  };
 }
 
 async disconnectRelationship(userId) {

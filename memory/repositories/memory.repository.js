@@ -223,6 +223,18 @@ async moveMemory(id, data) {
   }
 
   // ==========================================
+// Count Shared Memories
+// ==========================================
+
+async countSharedMemories(relationshipId) {
+  return Memory.countDocuments({
+    relationship: relationshipId,
+    space: "shared",
+    isDeleted: false,
+  });
+}
+
+  // ==========================================
 // Return Shared Memories To Owners
 // ==========================================
 

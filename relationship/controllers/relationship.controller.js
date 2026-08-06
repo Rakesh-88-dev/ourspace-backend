@@ -126,6 +126,22 @@ getRelationshipProfile = async (req, res, next) => {
 
 };
 
+getAchievements = async (req, res, next) => {
+  try {
+    const achievements =
+      await relationshipService.getAchievements(
+        req.user._id
+      );
+
+    res.status(200).json({
+      success: true,
+      data: achievements,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 disconnectRelationship = async (req, res, next) => {
   try {
     const result =

@@ -46,6 +46,33 @@ class WishlistRepository {
   }
 
   // =============================
+// COUNT SHARED WISHLIST
+// =============================
+
+async countSharedWishlist(
+  relationshipId
+) {
+  return Wishlist.countDocuments({
+    relationship: relationshipId,
+    visibility: "shared",
+  });
+}
+
+// =============================
+// COUNT COMPLETED SHARED WISHLIST
+// =============================
+
+async countCompletedSharedWishlist(
+  relationshipId
+) {
+  return Wishlist.countDocuments({
+    relationship: relationshipId,
+    visibility: "shared",
+    bought: true,
+  });
+}
+
+  // =============================
   // UPDATE
   // =============================
 
