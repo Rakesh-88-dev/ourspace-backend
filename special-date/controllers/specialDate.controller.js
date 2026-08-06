@@ -2,9 +2,14 @@ const asyncHandler = require("../../middleware/asyncHandler");
 const specialDateService = require("../services/specialDate.service");
 
 const createSpecialDate = asyncHandler(async (req, res) => {
+  console.log("========== CREATE SPECIAL DATE ==========");
+  console.log("BODY:", req.body);
+  console.log("FILE:", req.file);
+
   const specialDate = await specialDateService.createSpecialDate(
     req.user._id,
-    req.body
+    req.body,
+    req.file
   );
 
   res.status(201).json({

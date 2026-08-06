@@ -42,6 +42,7 @@ const createSpecialDate = async (
     EVENT_DEFAULTS.Custom;
 
   let coverImage = "";
+  console.log("SERVICE FILE:", file);
 
   if (file) {
 
@@ -68,6 +69,7 @@ const createSpecialDate = async (
     );
 
     coverImage = result.secure_url;
+    console.log("CLOUDINARY URL:", coverImage);
   }
 
   return specialDateRepository.create({
