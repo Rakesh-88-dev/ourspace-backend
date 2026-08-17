@@ -7,6 +7,9 @@ const {
 } = require("../memory/memory.service");
 
 const mapHistoryForAI = require("../utils/mapHistoryForAI");
+const {
+  buildContext,
+} = require("../context/context.service");
 
 
 const { buildMemoryContext } = require("../memory/memory.context");
@@ -74,13 +77,15 @@ const aiMessages = [...aiHistory];
 
 
  // Generate AI response
+const context = await buildContext({
+  userId,
+  conversationId: conversation._id,
+});
+
 const response = await generateResponse({
   messages: aiMessages,
   memoryContext,
-  context: {
-  userId,
-  conversationId: conversation._id,
-}
+  context,
 });
 
 // Generate title for new conversations
