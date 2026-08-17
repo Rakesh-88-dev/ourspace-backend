@@ -124,6 +124,61 @@ const buildToolFailureReply = (actions = []) => {
 
 /**
  * =====================================================
+ * BUILD WISHLIST RESPONSE
+ * =====================================================
+ *
+ * Creates a factual response using the actual wishlist
+ * result returned by the backend.
+ *
+ * Gemini does not know the wishlist count when it first
+ * generates its response, so we calculate it after the
+ * get_wishlist tool executes.
+ */
+
+const buildWishlistReply = (actions = []) => {
+  const wishlistAction = actions.find(
+    (action) =>
+      action?.tool === "get_wishlist"
+  );
+
+  // No wishlist tool was requested.
+  if (!wishlistAction) {
+    return null;
+  }
+
+  // Do not build a success message when the tool failed.
+  if (
+    wishlistAction?.result?.status !==
+    "success"
+  ) {
+    return null;
+  }
+
+  const wishlistData =
+    wishlistAction?.result?.data;
+
+  const items =
+    wishlistData?.items || [];
+
+  const count = items.length;
+
+  // Empty wishlist
+  if (count === 0) {
+    return "Your personal wishlist is currently empty.";
+  }
+
+  // One item
+  if (count === 1) {
+    return "You currently have 1 item in your personal wishlist. Here's what you've saved:";
+  }
+
+  // Multiple items
+  return `You currently have ${count} items in your personal wishlist. Here's what you've saved:`;
+};
+
+
+/**
+ * =====================================================
  * GENERATE CONVERSATIONAL AI RESPONSE
  * =====================================================
  */
@@ -140,9 +195,10 @@ const generateResponse = async ({
   // 1. Build system instruction
   // ===================================================
 
-  const systemInstruction = buildSystemPrompt({
-    memoryContext,
-  });
+  const systemInstruction =
+    buildSystemPrompt({
+      memoryContext,
+    });
 
   /*
    * Do not dump the complete system prompt into the
@@ -175,11 +231,12 @@ const generateResponse = async ({
   // 3. Generate Gemini/provider response
   // ===================================================
 
-  const rawResponse = await providerHandler({
-    messages,
-    model,
-    systemInstruction,
-  });
+  const rawResponse =
+    await providerHandler({
+      messages,
+      model,
+      systemInstruction,
+    });
 
 
   // ===================================================
@@ -196,17 +253,20 @@ const generateResponse = async ({
 
   const executedActions = [];
 
-  for (const action of response.actions || []) {
+  for (
+    const action of response.actions || []
+  ) {
 
     console.log(
       `[AURA] Executing tool: ${action.tool}`
     );
 
-    const result = await executeTool({
-      tool: action.tool,
-      args: action.arguments,
-      context,
-    });
+    const result =
+      await executeTool({
+        tool: action.tool,
+        args: action.arguments,
+        context,
+      });
 
     executedActions.push({
       tool: action.tool,
@@ -219,13 +279,18 @@ const generateResponse = async ({
     // Useful development logging
     // -----------------------------------------------
 
-    if (result.status === "success") {
+    if (
+      result.status === "success"
+    ) {
       console.log(
         `[AURA] Tool success: ${action.tool}`
       );
     } else {
       console.log(
-        `[AURA] Tool failed: ${action.tool} → ${result.code || "UNKNOWN_ERROR"}`
+        `[AURA] Tool failed: ${action.tool} → ${
+          result.code ||
+          "UNKNOWN_ERROR"
+        }`
       );
     }
   }
@@ -238,9 +303,9 @@ const generateResponse = async ({
   let finalReply = response.reply;
 
 
-  // -----------------------------------------------
-  // Permission denied
-  // -----------------------------------------------
+  // ===================================================
+  // 6A. Permission denied
+  // ===================================================
 
   const permissionDeniedReply =
     buildPermissionDeniedReply(
@@ -248,7 +313,9 @@ const generateResponse = async ({
     );
 
   if (permissionDeniedReply) {
-    finalReply = permissionDeniedReply;
+
+    finalReply =
+      permissionDeniedReply;
 
     console.log(
       "[AURA] Permission denied response generated."
@@ -256,9 +323,9 @@ const generateResponse = async ({
   }
 
 
-  // -----------------------------------------------
-  // Other tool failure
-  // -----------------------------------------------
+  // ===================================================
+  // 6B. Other tool failure
+  // ===================================================
 
   const toolFailureReply =
     buildToolFailureReply(
@@ -269,10 +336,46 @@ const generateResponse = async ({
     !permissionDeniedReply &&
     toolFailureReply
   ) {
-    finalReply = toolFailureReply;
+
+    finalReply =
+      toolFailureReply;
 
     console.log(
       "[AURA] Tool failure response generated."
+    );
+  }
+
+
+  // ===================================================
+  // 6C. Successful Wishlist Response
+  // ===================================================
+  //
+  // Only run this when there was no permission
+  // failure and no general tool failure.
+  //
+  // This prevents:
+  //
+  // "Your wishlist has 3 items"
+  //
+  // from being shown when access was actually denied.
+  // ===================================================
+
+  const wishlistReply =
+    buildWishlistReply(
+      executedActions
+    );
+
+  if (
+    !permissionDeniedReply &&
+    !toolFailureReply &&
+    wishlistReply
+  ) {
+
+    finalReply =
+      wishlistReply;
+
+    console.log(
+      "[AURA] Wishlist response generated."
     );
   }
 

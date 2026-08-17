@@ -116,12 +116,19 @@ const buildContext = async ({
   }
 
   // --------------------------------------------------
-  // 4. Return minimal AI context
+  // 4. Return authoritative Aura context
   // --------------------------------------------------
 
   return {
     version: 1,
 
+    // IMPORTANT:
+    // Keep userId at the top level because existing
+    // Aura tools use context.userId.
+    userId: user._id.toString(),
+
+    // Keep actor context for authorization and
+    // future multi-actor support.
     actor: {
       userId: user._id.toString(),
     },
