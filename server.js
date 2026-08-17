@@ -21,6 +21,7 @@ const demoRoutes = require("./demo/routes/demo.routes");
 const http = require("http");
 const { Server } = require("socket.io");
 const relationshipRoutes = require("./relationship/routes/relationship.routes");
+const permissionRoutes = require("./ai/authorization/permission.routes");
 const errorHandler = require("./middleware/errorHandler");
 
 
@@ -51,7 +52,10 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/relationship", relationshipRoutes);
 app.use("/api/demo", demoRoutes);
 app.use("/api/space", spaceRoutes);
-
+app.use(
+  "/api/ai/permissions",
+  permissionRoutes
+);
 
 
 
