@@ -12,45 +12,79 @@ const createWishlistItem = async ({
   shared = false,
 }) => {
   return Wishlist.create({
-    userId,
+    createdBy: userId,
+
     title: title.trim(),
+
     link: link.trim(),
+
     image: image.trim(),
+
     category: (category || "General").trim(),
-    shared,
+
+    visibility: shared ? "shared" : "personal",
+
+    relationship: null,
   });
 };
 
+
 /**
- * Find a wishlist item by title.
+ * Find a personal wishlist item by title.
  */
 const findWishlistItem = async ({
   userId,
   title,
 }) => {
   return Wishlist.findOne({
-    userId,
-    title: new RegExp(`^${title.trim()}$`, "i"),
+    createdBy: userId,
+
+    title: new RegExp(
+      `^${title.trim()}$`,
+      "i"
+    ),
+
+    visibility: "personal",
+
+    relationship: null,
   }).lean();
 };
 
+
 /**
- * Get all wishlist items for a user.
+ * Get the current user's personal wishlist.
  */
 const getWishlist = async ({
   userId,
 }) => {
-  return Wishlist.find({
-    userId,
+  console.log(
+    "[WISHLIST] Searching personal wishlist for:",
+    userId
+  );
+
+  const items = await Wishlist.find({
+    createdBy: userId,
+
+    visibility: "personal",
+
+    relationship: null,
   })
     .sort({
       createdAt: -1,
     })
     .lean();
+
+  console.log(
+    "[WISHLIST] Personal wishlist items:",
+    items
+  );
+
+  return items;
 };
 
+
 /**
- * Update a wishlist item.
+ * Update a personal wishlist item.
  */
 const updateWishlistItem = async ({
   userId,
@@ -59,8 +93,16 @@ const updateWishlistItem = async ({
 }) => {
   return Wishlist.findOneAndUpdate(
     {
-      userId,
-      title: new RegExp(`^${title.trim()}$`, "i"),
+      createdBy: userId,
+
+      title: new RegExp(
+        `^${title.trim()}$`,
+        "i"
+      ),
+
+      visibility: "personal",
+
+      relationship: null,
     },
     {
       $set: updates,
@@ -72,30 +114,42 @@ const updateWishlistItem = async ({
   );
 };
 
+
 /**
- * Delete a wishlist item.
+ * Delete a personal wishlist item.
  */
 const deleteWishlistItem = async ({
   userId,
   title,
 }) => {
   return Wishlist.findOneAndDelete({
-    userId,
-    title: new RegExp(`^${title.trim()}$`, "i"),
+    createdBy: userId,
+
+    title: new RegExp(
+      `^${title.trim()}$`,
+      "i"
+    ),
+
+    visibility: "personal",
+
+    relationship: null,
   });
 };
 
+
 /**
- * Add a wishlist item only if it doesn't already exist.
+ * Add a wishlist item only if it
+ * doesn't already exist.
  */
 const addWishlistItem = async ({
   userId,
   item,
 }) => {
-  const existingItem = await findWishlistItem({
-    userId,
-    title: item.title,
-  });
+  const existingItem =
+    await findWishlistItem({
+      userId,
+      title: item.title,
+    });
 
   if (existingItem) {
     return {
@@ -105,20 +159,27 @@ const addWishlistItem = async ({
     };
   }
 
-  const createdItem = await createWishlistItem({
-    userId,
-    title: item.title,
-    link: item.link,
-    image: item.image,
-    category: item.category,
-    shared: item.shared,
-  });
+  const createdItem =
+    await createWishlistItem({
+      userId,
+
+      title: item.title,
+
+      link: item.link,
+
+      image: item.image,
+
+      category: item.category,
+
+      shared: item.shared,
+    });
 
   return {
     success: true,
     item: createdItem,
   };
 };
+
 
 const WishlistRepository = {
   createWishlistItem,
@@ -128,5 +189,6 @@ const WishlistRepository = {
   deleteWishlistItem,
   addWishlistItem,
 };
+
 
 module.exports = WishlistRepository;

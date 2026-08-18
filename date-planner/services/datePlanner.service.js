@@ -1,0 +1,300 @@
+const datePlannerRepository = require(
+  "../repositories/datePlanner.repository"
+);
+
+const relationshipRepository = require(
+  "../../relationship/repositories/relationship.repository"
+);
+
+const ForbiddenError = require(
+  "../../errors/ForbiddenError"
+);
+
+const NotFoundError = require(
+  "../../errors/NotFoundError"
+);
+
+// =====================================================
+// GET ACTIVE RELATIONSHIP
+// =====================================================
+
+const getActiveRelationship = async (userId) => {
+  const relationship =
+    await relationshipRepository.findActiveRelationship(
+      userId
+    );
+
+  if (!relationship) {
+    throw new ForbiddenError(
+      "You must connect with a partner before using Date Planner."
+    );
+  }
+
+  return relationship;
+};
+
+// =====================================================
+// CREATE DATE PLAN
+// =====================================================
+
+const createDatePlan = async (
+  userId,
+  data
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  return datePlannerRepository.create({
+    ...data,
+
+    relationship: relationship._id,
+
+    createdBy: userId,
+  });
+};
+
+// =====================================================
+// GET ALL DATE PLANS
+// =====================================================
+
+const getDatePlans = async (userId) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  return datePlannerRepository.findByRelationship(
+    relationship._id
+  );
+};
+
+// =====================================================
+// GET UPCOMING DATE PLANS
+// =====================================================
+
+const getUpcomingDatePlans = async (
+  userId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  return datePlannerRepository.findUpcomingByRelationship(
+    relationship._id
+  );
+};
+
+// =====================================================
+// GET PAST DATE PLANS
+// =====================================================
+
+const getPastDatePlans = async (
+  userId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  return datePlannerRepository.findPastByRelationship(
+    relationship._id
+  );
+};
+
+// =====================================================
+// GET SINGLE DATE PLAN
+// =====================================================
+
+const getDatePlan = async (
+  userId,
+  datePlanId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to access this date plan."
+    );
+  }
+
+  return datePlan;
+};
+
+// =====================================================
+// UPDATE DATE PLAN
+// =====================================================
+
+const updateDatePlan = async (
+  userId,
+  datePlanId,
+  data
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to update this date plan."
+    );
+  }
+
+  return datePlannerRepository.update(
+    datePlanId,
+    data
+  );
+};
+
+// =====================================================
+// COMPLETE DATE PLAN
+// =====================================================
+
+const completeDatePlan = async (
+  userId,
+  datePlanId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to update this date plan."
+    );
+  }
+
+  return datePlannerRepository.update(
+    datePlanId,
+    {
+      status: "completed",
+    }
+  );
+};
+
+// =====================================================
+// CANCEL DATE PLAN
+// =====================================================
+
+const cancelDatePlan = async (
+  userId,
+  datePlanId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to update this date plan."
+    );
+  }
+
+  return datePlannerRepository.update(
+    datePlanId,
+    {
+      status: "cancelled",
+    }
+  );
+};
+
+// =====================================================
+// DELETE DATE PLAN
+// =====================================================
+
+const deleteDatePlan = async (
+  userId,
+  datePlanId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to delete this date plan."
+    );
+  }
+
+  await datePlannerRepository.remove(
+    datePlanId
+  );
+};
+
+module.exports = {
+  createDatePlan,
+  getDatePlans,
+  getUpcomingDatePlans,
+  getPastDatePlans,
+  getDatePlan,
+  updateDatePlan,
+  completeDatePlan,
+  cancelDatePlan,
+  deleteDatePlan,
+};

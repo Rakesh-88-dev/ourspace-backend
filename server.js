@@ -12,6 +12,9 @@ const specialDateRoutes = require(
   "./special-date/routes/specialDate.routes"
 );
 const wishlistRoutes = require("./wishlist/routes/wishlist.routes");
+const datePlannerRoutes = require(
+  "./date-planner/routes/datePlanner.routes"
+);
 const dashboardRoutes = require("./dashboard/routes/dashboard.routes");
 const statsRoutes = require("./routes/statsRoutes");
 const aiRoutes = require("./routes/ai.routes");
@@ -45,8 +48,13 @@ app.use("/api/memories", memoryRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/special-dates", specialDateRoutes);
+app.use(
+  "/api/date-planner",
+  datePlannerRoutes
+);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+
 app.use("/api/stats", statsRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/relationship", relationshipRoutes);
