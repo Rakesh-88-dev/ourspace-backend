@@ -21,6 +21,7 @@ const datePlannerController = require(
 const {
   createDatePlanValidation,
   updateDatePlanValidation,
+  updateDatePlanStatusValidation,
   datePlanIdValidation,
 } = require(
   "../validators/datePlanner.validator"
@@ -96,29 +97,16 @@ router.put(
 );
 
 // =====================================================
-// COMPLETE DATE PLAN
+// UPDATE DATE PLAN STATUS
 // =====================================================
 
 router.patch(
-  "/:id/complete",
+  "/:id/status",
   protect,
   demoGuard,
-  datePlanIdValidation,
+  updateDatePlanStatusValidation,
   validate,
-  datePlannerController.completeDatePlan
-);
-
-// =====================================================
-// CANCEL DATE PLAN
-// =====================================================
-
-router.patch(
-  "/:id/cancel",
-  protect,
-  demoGuard,
-  datePlanIdValidation,
-  validate,
-  datePlannerController.cancelDatePlan
+  datePlannerController.updateDatePlanStatus
 );
 
 // =====================================================

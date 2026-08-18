@@ -145,6 +145,28 @@ const updateDatePlanValidation = [
 ];
 
 // =====================================================
+// UPDATE DATE PLAN STATUS
+// =====================================================
+
+const updateDatePlanStatusValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage("Invalid Date Plan ID."),
+
+  body("status")
+    .notEmpty()
+    .withMessage("Status is required.")
+    .isIn([
+      "planned",
+      "completed",
+      "cancelled",
+    ])
+    .withMessage(
+      "Status must be planned, completed, or cancelled."
+    ),
+];
+
+// =====================================================
 // DATE PLAN ID VALIDATION
 // =====================================================
 
@@ -159,5 +181,6 @@ const datePlanIdValidation = [
 module.exports = {
   createDatePlanValidation,
   updateDatePlanValidation,
+  updateDatePlanStatusValidation,
   datePlanIdValidation,
 };

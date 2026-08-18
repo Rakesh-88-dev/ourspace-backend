@@ -171,12 +171,13 @@ const updateDatePlan = async (
 };
 
 // =====================================================
-// COMPLETE DATE PLAN
+// UPDATE DATE PLAN STATUS
 // =====================================================
 
-const completeDatePlan = async (
+const updateDatePlanStatus = async (
   userId,
-  datePlanId
+  datePlanId,
+  status
 ) => {
   const relationship =
     await getActiveRelationship(userId);
@@ -202,51 +203,9 @@ const completeDatePlan = async (
     );
   }
 
-  return datePlannerRepository.update(
+  return datePlannerRepository.updateStatus(
     datePlanId,
-    {
-      status: "completed",
-    }
-  );
-};
-
-// =====================================================
-// CANCEL DATE PLAN
-// =====================================================
-
-const cancelDatePlan = async (
-  userId,
-  datePlanId
-) => {
-  const relationship =
-    await getActiveRelationship(userId);
-
-  const datePlan =
-    await datePlannerRepository.findById(
-      datePlanId
-    );
-
-  if (!datePlan) {
-    throw new NotFoundError(
-      "Date plan not found."
-    );
-  }
-
-  if (
-    !datePlan.relationship.equals(
-      relationship._id
-    )
-  ) {
-    throw new ForbiddenError(
-      "You are not authorized to update this date plan."
-    );
-  }
-
-  return datePlannerRepository.update(
-    datePlanId,
-    {
-      status: "cancelled",
-    }
+    status
   );
 };
 
@@ -287,6 +246,10 @@ const deleteDatePlan = async (
   );
 };
 
+// =====================================================
+// EXPORT
+// =====================================================
+
 module.exports = {
   createDatePlan,
   getDatePlans,
@@ -294,7 +257,6 @@ module.exports = {
   getPastDatePlans,
   getDatePlan,
   updateDatePlan,
-  completeDatePlan,
-  cancelDatePlan,
+  updateDatePlanStatus,
   deleteDatePlan,
 };

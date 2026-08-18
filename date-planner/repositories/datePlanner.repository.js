@@ -83,6 +83,23 @@ const update = (id, data) => {
 };
 
 // =====================================================
+// UPDATE STATUS
+// =====================================================
+
+const updateStatus = (id, status) => {
+  return DatePlanner.findByIdAndUpdate(
+    id,
+    {
+      status,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+};
+
+// =====================================================
 // DELETE
 // =====================================================
 
@@ -130,6 +147,7 @@ module.exports = {
   findPastByRelationship,
   findByStatus,
   update,
+  updateStatus,
   remove,
   save,
   linkMemory,

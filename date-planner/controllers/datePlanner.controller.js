@@ -120,41 +120,22 @@ const updateDatePlan =
   });
 
 // =====================================================
-// COMPLETE
+// UPDATE STATUS
 // =====================================================
 
-const completeDatePlan =
+const updateDatePlanStatus =
   asyncHandler(async (req, res) => {
     const datePlan =
-      await datePlannerService.completeDatePlan(
+      await datePlannerService.updateDatePlanStatus(
         req.user._id,
-        req.params.id
+        req.params.id,
+        req.body.status
       );
 
     res.status(200).json({
       success: true,
       message:
-        "Date plan marked as completed.",
-      data: datePlan,
-    });
-  });
-
-// =====================================================
-// CANCEL
-// =====================================================
-
-const cancelDatePlan =
-  asyncHandler(async (req, res) => {
-    const datePlan =
-      await datePlannerService.cancelDatePlan(
-        req.user._id,
-        req.params.id
-      );
-
-    res.status(200).json({
-      success: true,
-      message:
-        "Date plan cancelled successfully.",
+        "Date plan status updated successfully.",
       data: datePlan,
     });
   });
@@ -177,6 +158,10 @@ const deleteDatePlan =
     });
   });
 
+// =====================================================
+// EXPORT
+// =====================================================
+
 module.exports = {
   createDatePlan,
   getDatePlans,
@@ -184,7 +169,6 @@ module.exports = {
   getUpcomingDatePlans,
   getPastDatePlans,
   updateDatePlan,
-  completeDatePlan,
-  cancelDatePlan,
+  updateDatePlanStatus,
   deleteDatePlan,
 };
