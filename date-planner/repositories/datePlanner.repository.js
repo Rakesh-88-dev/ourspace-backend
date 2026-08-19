@@ -1,4 +1,6 @@
-const DatePlanner = require("../models/DatePlanner");
+const DatePlanner = require(
+  "../models/DatePlanner"
+);
 
 // =====================================================
 // CREATE
@@ -13,17 +15,22 @@ const create = (data) => {
 // =====================================================
 
 const findById = (id) => {
-  return DatePlanner.findById(id);
+  return DatePlanner.findById(id)
+    .populate("linkedMemories");
 };
 
 // =====================================================
 // FIND ALL BY RELATIONSHIP
 // =====================================================
 
-const findByRelationship = (relationshipId) => {
+const findByRelationship = (
+  relationshipId
+) => {
   return DatePlanner.find({
     relationship: relationshipId,
-  }).sort({ date: 1 });
+  })
+    .populate("linkedMemories")
+    .sort({ date: 1 });
 };
 
 // =====================================================
@@ -35,11 +42,15 @@ const findUpcomingByRelationship = (
 ) => {
   return DatePlanner.find({
     relationship: relationshipId,
+
     date: {
       $gte: new Date(),
     },
+
     status: "planned",
-  }).sort({ date: 1 });
+  })
+    .populate("linkedMemories")
+    .sort({ date: 1 });
 };
 
 // =====================================================
@@ -51,10 +62,13 @@ const findPastByRelationship = (
 ) => {
   return DatePlanner.find({
     relationship: relationshipId,
+
     date: {
       $lt: new Date(),
     },
-  }).sort({ date: -1 });
+  })
+    .populate("linkedMemories")
+    .sort({ date: -1 });
 };
 
 // =====================================================
@@ -68,14 +82,19 @@ const findByStatus = (
   return DatePlanner.find({
     relationship: relationshipId,
     status,
-  }).sort({ date: 1 });
+  })
+    .populate("linkedMemories")
+    .sort({ date: 1 });
 };
 
 // =====================================================
 // UPDATE
 // =====================================================
 
-const update = (id, data) => {
+const update = (
+  id,
+  data
+) => {
   return DatePlanner.findByIdAndUpdate(
     id,
     data,
@@ -83,7 +102,7 @@ const update = (id, data) => {
       new: true,
       runValidators: true,
     }
-  );
+  ).populate("linkedMemories");
 };
 
 // =====================================================
@@ -103,7 +122,7 @@ const updateStatus = (
       new: true,
       runValidators: true,
     }
-  );
+  ).populate("linkedMemories");
 };
 
 // =====================================================
@@ -118,7 +137,9 @@ const remove = (id) => {
 // SAVE DOCUMENT
 // =====================================================
 
-const save = (datePlanner) => {
+const save = (
+  datePlanner
+) => {
   return datePlanner.save();
 };
 
@@ -141,7 +162,7 @@ const linkMemory = (
       new: true,
       runValidators: true,
     }
-  );
+  ).populate("linkedMemories");
 };
 
 // =====================================================
@@ -163,7 +184,7 @@ const unlinkMemory = (
       new: true,
       runValidators: true,
     }
-  );
+  ).populate("linkedMemories");
 };
 
 // =====================================================

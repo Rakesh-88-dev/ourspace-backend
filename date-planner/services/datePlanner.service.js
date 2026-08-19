@@ -6,6 +6,10 @@ const relationshipRepository = require(
   "../../relationship/repositories/relationship.repository"
 );
 
+const Memory = require(
+  "../../memory/models/Memory"
+);
+
 const ForbiddenError = require(
   "../../errors/ForbiddenError"
 );
@@ -278,6 +282,20 @@ const linkMemoryToDatePlan =
         userId
       );
 
+    // =================================================
+    // VALIDATE MEMORY ID
+    // =================================================
+
+    if (!memoryId) {
+      throw new NotFoundError(
+        "Memory ID is required."
+      );
+    }
+
+    // =================================================
+    // FIND DATE PLAN
+    // =================================================
+
     const datePlan =
       await datePlannerRepository.findById(
         datePlanId
@@ -289,6 +307,10 @@ const linkMemoryToDatePlan =
       );
     }
 
+    // =================================================
+    // CHECK DATE PLAN RELATIONSHIP
+    // =================================================
+
     if (
       !datePlan.relationship.equals(
         relationship._id
@@ -299,11 +321,40 @@ const linkMemoryToDatePlan =
       );
     }
 
-    if (!memoryId) {
+    // =================================================
+    // FIND MEMORY
+    // =================================================
+
+    const memory =
+      await Memory.findOne({
+        _id: memoryId,
+        isDeleted: false,
+      });
+
+    if (!memory) {
       throw new NotFoundError(
-        "Memory ID is required."
+        "Memory not found."
       );
     }
+
+    // =================================================
+    // CHECK MEMORY RELATIONSHIP
+    // =================================================
+
+    if (
+      !memory.relationship ||
+      !memory.relationship.equals(
+        relationship._id
+      )
+    ) {
+      throw new ForbiddenError(
+        "You are not authorized to link this memory."
+      );
+    }
+
+    // =================================================
+    // LINK MEMORY
+    // =================================================
 
     return datePlannerRepository.linkMemory(
       datePlanId,
@@ -326,6 +377,20 @@ const unlinkMemoryFromDatePlan =
         userId
       );
 
+    // =================================================
+    // VALIDATE MEMORY ID
+    // =================================================
+
+    if (!memoryId) {
+      throw new NotFoundError(
+        "Memory ID is required."
+      );
+    }
+
+    // =================================================
+    // FIND DATE PLAN
+    // =================================================
+
     const datePlan =
       await datePlannerRepository.findById(
         datePlanId
@@ -337,6 +402,10 @@ const unlinkMemoryFromDatePlan =
       );
     }
 
+    // =================================================
+    // CHECK DATE PLAN RELATIONSHIP
+    // =================================================
+
     if (
       !datePlan.relationship.equals(
         relationship._id
@@ -347,11 +416,40 @@ const unlinkMemoryFromDatePlan =
       );
     }
 
-    if (!memoryId) {
+    // =================================================
+    // FIND MEMORY
+    // =================================================
+
+    const memory =
+      await Memory.findOne({
+        _id: memoryId,
+        isDeleted: false,
+      });
+
+    if (!memory) {
       throw new NotFoundError(
-        "Memory ID is required."
+        "Memory not found."
       );
     }
+
+    // =================================================
+    // CHECK MEMORY RELATIONSHIP
+    // =================================================
+
+    if (
+      !memory.relationship ||
+      !memory.relationship.equals(
+        relationship._id
+      )
+    ) {
+      throw new ForbiddenError(
+        "You are not authorized to unlink this memory."
+      );
+    }
+
+    // =================================================
+    // UNLINK MEMORY
+    // =================================================
 
     return datePlannerRepository.unlinkMemory(
       datePlanId,

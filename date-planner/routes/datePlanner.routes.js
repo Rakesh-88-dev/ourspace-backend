@@ -1,4 +1,6 @@
-const express = require("express");
+const express = require(
+  "express"
+);
 
 const router = express.Router();
 
@@ -23,6 +25,8 @@ const {
   updateDatePlanValidation,
   updateDatePlanStatusValidation,
   datePlanIdValidation,
+  linkMemoryValidation,
+  unlinkMemoryValidation,
 } = require(
   "../validators/datePlanner.validator"
 );
@@ -117,7 +121,7 @@ router.patch(
   "/:id/memory",
   protect,
   demoGuard,
-  datePlanIdValidation,
+  linkMemoryValidation,
   validate,
   datePlannerController.linkMemoryToDatePlan
 );
@@ -130,7 +134,7 @@ router.delete(
   "/:id/memory/:memoryId",
   protect,
   demoGuard,
-  datePlanIdValidation,
+  unlinkMemoryValidation,
   validate,
   datePlannerController.unlinkMemoryFromDatePlan
 );

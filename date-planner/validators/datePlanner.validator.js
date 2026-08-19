@@ -1,4 +1,6 @@
-const { body, param } = require("express-validator");
+const { body, param } = require(
+  "express-validator"
+);
 
 // =====================================================
 // CREATE DATE PLAN VALIDATION
@@ -40,7 +42,9 @@ const createDatePlanValidation = [
       "Home",
       "Other",
     ])
-    .withMessage("Invalid date category."),
+    .withMessage(
+      "Invalid date category."
+    ),
 
   body("location")
     .optional()
@@ -111,7 +115,9 @@ const updateDatePlanValidation = [
       "Home",
       "Other",
     ])
-    .withMessage("Invalid date category."),
+    .withMessage(
+      "Invalid date category."
+    ),
 
   body("location")
     .optional()
@@ -151,11 +157,15 @@ const updateDatePlanValidation = [
 const updateDatePlanStatusValidation = [
   param("id")
     .isMongoId()
-    .withMessage("Invalid Date Plan ID."),
+    .withMessage(
+      "Invalid Date Plan ID."
+    ),
 
   body("status")
     .notEmpty()
-    .withMessage("Status is required.")
+    .withMessage(
+      "Status is required."
+    )
     .isIn([
       "planned",
       "completed",
@@ -178,9 +188,55 @@ const datePlanIdValidation = [
     ),
 ];
 
+// =====================================================
+// LINK MEMORY TO DATE PLAN VALIDATION
+// =====================================================
+
+const linkMemoryValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage(
+      "Invalid Date Plan ID."
+    ),
+
+  body("memoryId")
+    .notEmpty()
+    .withMessage(
+      "Memory ID is required."
+    )
+    .isMongoId()
+    .withMessage(
+      "Invalid Memory ID."
+    ),
+];
+
+// =====================================================
+// UNLINK MEMORY FROM DATE PLAN VALIDATION
+// =====================================================
+
+const unlinkMemoryValidation = [
+  param("id")
+    .isMongoId()
+    .withMessage(
+      "Invalid Date Plan ID."
+    ),
+
+  param("memoryId")
+    .isMongoId()
+    .withMessage(
+      "Invalid Memory ID."
+    ),
+];
+
+// =====================================================
+// EXPORT
+// =====================================================
+
 module.exports = {
   createDatePlanValidation,
   updateDatePlanValidation,
   updateDatePlanStatusValidation,
   datePlanIdValidation,
+  linkMemoryValidation,
+  unlinkMemoryValidation,
 };
