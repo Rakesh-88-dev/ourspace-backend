@@ -246,6 +246,46 @@ const deleteDatePlan = async (
   );
 };
 
+
+// =====================================================
+// LINK MEMORY TO DATE PLAN
+// =====================================================
+
+const linkMemoryToDatePlan = async (
+  userId,
+  datePlanId,
+  memoryId
+) => {
+  const relationship =
+    await getActiveRelationship(userId);
+
+  const datePlan =
+    await datePlannerRepository.findById(
+      datePlanId
+    );
+
+  if (!datePlan) {
+    throw new NotFoundError(
+      "Date plan not found."
+    );
+  }
+
+  if (
+    !datePlan.relationship.equals(
+      relationship._id
+    )
+  ) {
+    throw new ForbiddenError(
+      "You are not authorized to update this date plan."
+    );
+  }
+
+  return datePlannerRepository.linkMemory(
+    datePlanId,
+    memoryId
+  );
+};
+
 // =====================================================
 // EXPORT
 // =====================================================
@@ -259,4 +299,5 @@ module.exports = {
   updateDatePlan,
   updateDatePlanStatus,
   deleteDatePlan,
+  linkMemoryToDatePlan,
 };

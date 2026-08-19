@@ -122,4 +122,19 @@ router.delete(
   datePlannerController.deleteDatePlan
 );
 
+// =====================================================
+// LINK MEMORY TO DATE PLAN
+// =====================================================
+
+router.patch(
+  "/:id/memory",
+  protect,
+  demoGuard,
+  datePlanIdValidation,
+  validate,
+  datePlannerController.linkMemoryToDatePlan
+);
+
 module.exports = router;
+
+
