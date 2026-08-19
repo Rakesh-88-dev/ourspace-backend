@@ -91,7 +91,7 @@ const updateDatePlanValidation = [
     .trim()
     .isLength({ max: 5000 })
     .withMessage(
-      "Description cannot exceed 1000 characters."
+      "Description cannot exceed 5000 characters."
     ),
 
   body("date")

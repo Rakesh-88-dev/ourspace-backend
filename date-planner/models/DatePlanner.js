@@ -16,7 +16,7 @@ const datePlannerSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      maxlength: 1000,
+      maxlength: 5000,
       default: "",
     },
 
