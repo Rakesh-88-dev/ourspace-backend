@@ -7,7 +7,7 @@ const relationshipRepository = require(
 );
 
 const Memory = require(
-  "../../memory/models/Memory"
+  "../../../models/Memory"
 );
 
 const ForbiddenError = require(
