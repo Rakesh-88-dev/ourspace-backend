@@ -158,7 +158,7 @@ const deleteDatePlan =
     });
   });
 
-  // =====================================================
+// =====================================================
 // LINK MEMORY
 // =====================================================
 
@@ -180,6 +180,27 @@ const linkMemoryToDatePlan =
   });
 
 // =====================================================
+// UNLINK MEMORY
+// =====================================================
+
+const unlinkMemoryFromDatePlan =
+  asyncHandler(async (req, res) => {
+    const datePlan =
+      await datePlannerService.unlinkMemoryFromDatePlan(
+        req.user._id,
+        req.params.id,
+        req.params.memoryId
+      );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Memory unlinked from date plan successfully.",
+      data: datePlan,
+    });
+  });
+
+// =====================================================
 // EXPORT
 // =====================================================
 
@@ -193,4 +214,5 @@ module.exports = {
   updateDatePlanStatus,
   deleteDatePlan,
   linkMemoryToDatePlan,
+  unlinkMemoryFromDatePlan,
 };

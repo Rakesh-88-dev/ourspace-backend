@@ -113,14 +113,15 @@ const datePlannerSchema = new mongoose.Schema(
     },
 
     // =====================================================
-    // OPTIONAL MEMORY LINK
+    // LINKED MEMORIES
     // =====================================================
 
-    linkedMemory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Memory",
-      default: null,
-    },
+    linkedMemories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Memory",
+      },
+    ],
   },
   {
     timestamps: true,

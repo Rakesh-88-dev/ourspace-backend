@@ -110,19 +110,6 @@ router.patch(
 );
 
 // =====================================================
-// DELETE DATE PLAN
-// =====================================================
-
-router.delete(
-  "/:id",
-  protect,
-  demoGuard,
-  datePlanIdValidation,
-  validate,
-  datePlannerController.deleteDatePlan
-);
-
-// =====================================================
 // LINK MEMORY TO DATE PLAN
 // =====================================================
 
@@ -135,6 +122,30 @@ router.patch(
   datePlannerController.linkMemoryToDatePlan
 );
 
+// =====================================================
+// UNLINK MEMORY FROM DATE PLAN
+// =====================================================
+
+router.delete(
+  "/:id/memory/:memoryId",
+  protect,
+  demoGuard,
+  datePlanIdValidation,
+  validate,
+  datePlannerController.unlinkMemoryFromDatePlan
+);
+
+// =====================================================
+// DELETE DATE PLAN
+// =====================================================
+
+router.delete(
+  "/:id",
+  protect,
+  demoGuard,
+  datePlanIdValidation,
+  validate,
+  datePlannerController.deleteDatePlan
+);
+
 module.exports = router;
-
-

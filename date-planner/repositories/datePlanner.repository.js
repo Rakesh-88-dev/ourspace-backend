@@ -30,7 +30,9 @@ const findByRelationship = (relationshipId) => {
 // FIND UPCOMING DATES
 // =====================================================
 
-const findUpcomingByRelationship = (relationshipId) => {
+const findUpcomingByRelationship = (
+  relationshipId
+) => {
   return DatePlanner.find({
     relationship: relationshipId,
     date: {
@@ -44,7 +46,9 @@ const findUpcomingByRelationship = (relationshipId) => {
 // FIND PAST DATES
 // =====================================================
 
-const findPastByRelationship = (relationshipId) => {
+const findPastByRelationship = (
+  relationshipId
+) => {
   return DatePlanner.find({
     relationship: relationshipId,
     date: {
@@ -86,7 +90,10 @@ const update = (id, data) => {
 // UPDATE STATUS
 // =====================================================
 
-const updateStatus = (id, status) => {
+const updateStatus = (
+  id,
+  status
+) => {
   return DatePlanner.findByIdAndUpdate(
     id,
     {
@@ -126,7 +133,31 @@ const linkMemory = (
   return DatePlanner.findByIdAndUpdate(
     id,
     {
-      linkedMemory: memoryId,
+      $addToSet: {
+        linkedMemories: memoryId,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+};
+
+// =====================================================
+// UNLINK MEMORY
+// =====================================================
+
+const unlinkMemory = (
+  id,
+  memoryId
+) => {
+  return DatePlanner.findByIdAndUpdate(
+    id,
+    {
+      $pull: {
+        linkedMemories: memoryId,
+      },
     },
     {
       new: true,
@@ -151,4 +182,5 @@ module.exports = {
   remove,
   save,
   linkMemory,
+  unlinkMemory,
 };

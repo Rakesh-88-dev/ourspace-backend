@@ -18,7 +18,9 @@ const NotFoundError = require(
 // GET ACTIVE RELATIONSHIP
 // =====================================================
 
-const getActiveRelationship = async (userId) => {
+const getActiveRelationship = async (
+  userId
+) => {
   const relationship =
     await relationshipRepository.findActiveRelationship(
       userId
@@ -47,7 +49,8 @@ const createDatePlan = async (
   return datePlannerRepository.create({
     ...data,
 
-    relationship: relationship._id,
+    relationship:
+      relationship._id,
 
     createdBy: userId,
   });
@@ -57,7 +60,9 @@ const createDatePlan = async (
 // GET ALL DATE PLANS
 // =====================================================
 
-const getDatePlans = async (userId) => {
+const getDatePlans = async (
+  userId
+) => {
   const relationship =
     await getActiveRelationship(userId);
 
@@ -70,16 +75,17 @@ const getDatePlans = async (userId) => {
 // GET UPCOMING DATE PLANS
 // =====================================================
 
-const getUpcomingDatePlans = async (
-  userId
-) => {
-  const relationship =
-    await getActiveRelationship(userId);
+const getUpcomingDatePlans =
+  async (userId) => {
+    const relationship =
+      await getActiveRelationship(
+        userId
+      );
 
-  return datePlannerRepository.findUpcomingByRelationship(
-    relationship._id
-  );
-};
+    return datePlannerRepository.findUpcomingByRelationship(
+      relationship._id
+    );
+  };
 
 // =====================================================
 // GET PAST DATE PLANS
@@ -89,7 +95,9 @@ const getPastDatePlans = async (
   userId
 ) => {
   const relationship =
-    await getActiveRelationship(userId);
+    await getActiveRelationship(
+      userId
+    );
 
   return datePlannerRepository.findPastByRelationship(
     relationship._id
@@ -105,7 +113,9 @@ const getDatePlan = async (
   datePlanId
 ) => {
   const relationship =
-    await getActiveRelationship(userId);
+    await getActiveRelationship(
+      userId
+    );
 
   const datePlan =
     await datePlannerRepository.findById(
@@ -141,7 +151,9 @@ const updateDatePlan = async (
   data
 ) => {
   const relationship =
-    await getActiveRelationship(userId);
+    await getActiveRelationship(
+      userId
+    );
 
   const datePlan =
     await datePlannerRepository.findById(
@@ -174,40 +186,43 @@ const updateDatePlan = async (
 // UPDATE DATE PLAN STATUS
 // =====================================================
 
-const updateDatePlanStatus = async (
-  userId,
-  datePlanId,
-  status
-) => {
-  const relationship =
-    await getActiveRelationship(userId);
-
-  const datePlan =
-    await datePlannerRepository.findById(
-      datePlanId
-    );
-
-  if (!datePlan) {
-    throw new NotFoundError(
-      "Date plan not found."
-    );
-  }
-
-  if (
-    !datePlan.relationship.equals(
-      relationship._id
-    )
-  ) {
-    throw new ForbiddenError(
-      "You are not authorized to update this date plan."
-    );
-  }
-
-  return datePlannerRepository.updateStatus(
+const updateDatePlanStatus =
+  async (
+    userId,
     datePlanId,
     status
-  );
-};
+  ) => {
+    const relationship =
+      await getActiveRelationship(
+        userId
+      );
+
+    const datePlan =
+      await datePlannerRepository.findById(
+        datePlanId
+      );
+
+    if (!datePlan) {
+      throw new NotFoundError(
+        "Date plan not found."
+      );
+    }
+
+    if (
+      !datePlan.relationship.equals(
+        relationship._id
+      )
+    ) {
+      throw new ForbiddenError(
+        "You are not authorized to update this date plan."
+      );
+    }
+
+    return datePlannerRepository.updateStatus(
+      datePlanId,
+      status
+    );
+  };
 
 // =====================================================
 // DELETE DATE PLAN
@@ -218,7 +233,9 @@ const deleteDatePlan = async (
   datePlanId
 ) => {
   const relationship =
-    await getActiveRelationship(userId);
+    await getActiveRelationship(
+      userId
+    );
 
   const datePlan =
     await datePlannerRepository.findById(
@@ -246,45 +263,101 @@ const deleteDatePlan = async (
   );
 };
 
-
 // =====================================================
 // LINK MEMORY TO DATE PLAN
 // =====================================================
 
-const linkMemoryToDatePlan = async (
-  userId,
-  datePlanId,
-  memoryId
-) => {
-  const relationship =
-    await getActiveRelationship(userId);
-
-  const datePlan =
-    await datePlannerRepository.findById(
-      datePlanId
-    );
-
-  if (!datePlan) {
-    throw new NotFoundError(
-      "Date plan not found."
-    );
-  }
-
-  if (
-    !datePlan.relationship.equals(
-      relationship._id
-    )
-  ) {
-    throw new ForbiddenError(
-      "You are not authorized to update this date plan."
-    );
-  }
-
-  return datePlannerRepository.linkMemory(
+const linkMemoryToDatePlan =
+  async (
+    userId,
     datePlanId,
     memoryId
-  );
-};
+  ) => {
+    const relationship =
+      await getActiveRelationship(
+        userId
+      );
+
+    const datePlan =
+      await datePlannerRepository.findById(
+        datePlanId
+      );
+
+    if (!datePlan) {
+      throw new NotFoundError(
+        "Date plan not found."
+      );
+    }
+
+    if (
+      !datePlan.relationship.equals(
+        relationship._id
+      )
+    ) {
+      throw new ForbiddenError(
+        "You are not authorized to update this date plan."
+      );
+    }
+
+    if (!memoryId) {
+      throw new NotFoundError(
+        "Memory ID is required."
+      );
+    }
+
+    return datePlannerRepository.linkMemory(
+      datePlanId,
+      memoryId
+    );
+  };
+
+// =====================================================
+// UNLINK MEMORY FROM DATE PLAN
+// =====================================================
+
+const unlinkMemoryFromDatePlan =
+  async (
+    userId,
+    datePlanId,
+    memoryId
+  ) => {
+    const relationship =
+      await getActiveRelationship(
+        userId
+      );
+
+    const datePlan =
+      await datePlannerRepository.findById(
+        datePlanId
+      );
+
+    if (!datePlan) {
+      throw new NotFoundError(
+        "Date plan not found."
+      );
+    }
+
+    if (
+      !datePlan.relationship.equals(
+        relationship._id
+      )
+    ) {
+      throw new ForbiddenError(
+        "You are not authorized to update this date plan."
+      );
+    }
+
+    if (!memoryId) {
+      throw new NotFoundError(
+        "Memory ID is required."
+      );
+    }
+
+    return datePlannerRepository.unlinkMemory(
+      datePlanId,
+      memoryId
+    );
+  };
 
 // =====================================================
 // EXPORT
@@ -300,4 +373,5 @@ module.exports = {
   updateDatePlanStatus,
   deleteDatePlan,
   linkMemoryToDatePlan,
+  unlinkMemoryFromDatePlan,
 };
