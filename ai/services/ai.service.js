@@ -2,6 +2,10 @@ const {
   buildSystemPrompt,
 } = require("../prompts");
 
+const memoryReflectionPrompt = require(
+  "../prompts/memoryReflectionPrompt"
+);
+
 const {
   parseToolResponse,
 } = require("../tools/tool.parser");
@@ -10,7 +14,9 @@ const {
   executeTool,
 } = require("../tools/tool.executor");
 
-const ProviderRegistry = require("../providers/provider.registry");
+const ProviderRegistry = require(
+  "../providers/provider.registry"
+);
 
 const AppError = require("../utils/AppError");
 
@@ -18,10 +24,6 @@ const AppError = require("../utils/AppError");
  * =====================================================
  * TOOL FRIENDLY RESPONSES
  * =====================================================
- *
- * These messages are used when Aura successfully
- * understands the user's request, but the requested
- * tool cannot be executed because of permissions.
  */
 
 const PERMISSION_MESSAGES = {
@@ -68,7 +70,6 @@ const PERMISSION_MESSAGES = {
     "I can help remove that special date, but I don't currently have permission to delete special dates. You can enable Special Dates access below.",
 };
 
-
 /**
  * =====================================================
  * BUILD PERMISSION DENIED RESPONSE
@@ -78,7 +79,8 @@ const PERMISSION_MESSAGES = {
 const buildPermissionDeniedReply = (actions = []) => {
   const deniedAction = actions.find(
     (action) =>
-      action?.result?.code === "AURA_PERMISSION_DENIED"
+      action?.result?.code ===
+      "AURA_PERMISSION_DENIED"
   );
 
   if (!deniedAction) {
@@ -92,7 +94,6 @@ const buildPermissionDeniedReply = (actions = []) => {
     "I understand what you'd like me to do, but I don't currently have permission to access that information. You can enable the required Aura access below."
   );
 };
-
 
 /**
  * =====================================================
@@ -110,7 +111,6 @@ const buildToolFailureReply = (actions = []) => {
     return null;
   }
 
-  // Permission failures are handled separately.
   if (
     failedAction?.result?.code ===
     "AURA_PERMISSION_DENIED"
@@ -121,18 +121,10 @@ const buildToolFailureReply = (actions = []) => {
   return "I understood your request, but I wasn't able to complete that action right now. Please try again.";
 };
 
-
 /**
  * =====================================================
  * BUILD WISHLIST RESPONSE
  * =====================================================
- *
- * Creates a factual response using the actual wishlist
- * result returned by the backend.
- *
- * Gemini does not know the wishlist count when it first
- * generates its response, so we calculate it after the
- * get_wishlist tool executes.
  */
 
 const buildWishlistReply = (actions = []) => {
@@ -141,12 +133,10 @@ const buildWishlistReply = (actions = []) => {
       action?.tool === "get_wishlist"
   );
 
-  // No wishlist tool was requested.
   if (!wishlistAction) {
     return null;
   }
 
-  // Do not build a success message when the tool failed.
   if (
     wishlistAction?.result?.status !==
     "success"
@@ -162,20 +152,16 @@ const buildWishlistReply = (actions = []) => {
 
   const count = items.length;
 
-  // Empty wishlist
   if (count === 0) {
     return "Your personal wishlist is currently empty.";
   }
 
-  // One item
   if (count === 1) {
     return "You currently have 1 item in your personal wishlist. Here's what you've saved:";
   }
 
-  // Multiple items
   return `You currently have ${count} items in your personal wishlist. Here's what you've saved:`;
 };
-
 
 /**
  * =====================================================
@@ -190,31 +176,14 @@ const generateResponse = async ({
   memoryContext = "",
   context = {},
 }) => {
-
-  // ===================================================
-  // 1. Build system instruction
-  // ===================================================
-
   const systemInstruction =
     buildSystemPrompt({
       memoryContext,
     });
 
-  /*
-   * Do not dump the complete system prompt into the
-   * terminal. It can contain internal instructions,
-   * memory context and other sensitive application
-   * context.
-   */
-
   console.log(
     `[AURA] Generating response with provider: ${provider}`
   );
-
-
-  // ===================================================
-  // 2. Resolve provider
-  // ===================================================
 
   const providerHandler =
     ProviderRegistry[provider];
@@ -226,11 +195,6 @@ const generateResponse = async ({
     );
   }
 
-
-  // ===================================================
-  // 3. Generate Gemini/provider response
-  // ===================================================
-
   const rawResponse =
     await providerHandler({
       messages,
@@ -238,25 +202,14 @@ const generateResponse = async ({
       systemInstruction,
     });
 
-
-  // ===================================================
-  // 4. Parse structured response
-  // ===================================================
-
   const response =
     parseToolResponse(rawResponse);
-
-
-  // ===================================================
-  // 5. Execute requested tools
-  // ===================================================
 
   const executedActions = [];
 
   for (
     const action of response.actions || []
   ) {
-
     console.log(
       `[AURA] Executing tool: ${action.tool}`
     );
@@ -274,11 +227,6 @@ const generateResponse = async ({
       result,
     });
 
-
-    // -----------------------------------------------
-    // Useful development logging
-    // -----------------------------------------------
-
     if (
       result.status === "success"
     ) {
@@ -295,17 +243,7 @@ const generateResponse = async ({
     }
   }
 
-
-  // ===================================================
-  // 6. Determine final Aura reply
-  // ===================================================
-
   let finalReply = response.reply;
-
-
-  // ===================================================
-  // 6A. Permission denied
-  // ===================================================
 
   const permissionDeniedReply =
     buildPermissionDeniedReply(
@@ -313,7 +251,6 @@ const generateResponse = async ({
     );
 
   if (permissionDeniedReply) {
-
     finalReply =
       permissionDeniedReply;
 
@@ -321,11 +258,6 @@ const generateResponse = async ({
       "[AURA] Permission denied response generated."
     );
   }
-
-
-  // ===================================================
-  // 6B. Other tool failure
-  // ===================================================
 
   const toolFailureReply =
     buildToolFailureReply(
@@ -336,7 +268,6 @@ const generateResponse = async ({
     !permissionDeniedReply &&
     toolFailureReply
   ) {
-
     finalReply =
       toolFailureReply;
 
@@ -344,21 +275,6 @@ const generateResponse = async ({
       "[AURA] Tool failure response generated."
     );
   }
-
-
-  // ===================================================
-  // 6C. Successful Wishlist Response
-  // ===================================================
-  //
-  // Only run this when there was no permission
-  // failure and no general tool failure.
-  //
-  // This prevents:
-  //
-  // "Your wishlist has 3 items"
-  //
-  // from being shown when access was actually denied.
-  // ===================================================
 
   const wishlistReply =
     buildWishlistReply(
@@ -370,7 +286,6 @@ const generateResponse = async ({
     !toolFailureReply &&
     wishlistReply
   ) {
-
     finalReply =
       wishlistReply;
 
@@ -379,18 +294,10 @@ const generateResponse = async ({
     );
   }
 
-
-  // ===================================================
-  // 7. Return final structured response
-  // ===================================================
-
   return {
     reply: finalReply,
-
     title: response.title,
-
     actions: executedActions,
-
     metadata: {
       ...(response.metadata || {}),
       provider,
@@ -399,6 +306,126 @@ const generateResponse = async ({
   };
 };
 
+/**
+ * =====================================================
+ * GENERATE MEMORY REFLECTION
+ * =====================================================
+ *
+ * Dedicated Aura capability for Memory Viewer.
+ *
+ * This does NOT create a conversation and does NOT
+ * execute tools. It simply asks Aura to reflect on
+ * the supplied memory.
+ */
+
+const generateMemoryReflection = async ({
+  memory,
+  provider = "gemini",
+  model = process.env.GEMINI_MODEL,
+}) => {
+  const providerHandler =
+    ProviderRegistry[provider];
+
+  if (!providerHandler) {
+    throw new AppError(
+      `Unsupported AI provider: ${provider}`,
+      400
+    );
+  }
+
+  if (!memory) {
+    throw new AppError(
+      "Memory is required for reflection.",
+      400
+    );
+  }
+
+  const memoryDate = memory.memoryDate
+    ? new Date(
+        memory.memoryDate
+      ).toLocaleDateString(
+        "en-IN",
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }
+      )
+    : "";
+
+  const memoryData = {
+    title: memory.title || "",
+    caption: memory.caption || "",
+    date: memoryDate,
+    location: memory.location || "",
+    tags: memory.tags || [],
+    mediaType:
+      memory.media?.type || "image",
+  };
+
+  const messages = [
+    {
+      role: "user",
+      content: JSON.stringify(
+        memoryData,
+        null,
+        2
+      ),
+    },
+  ];
+
+  console.log(
+    `[AURA] Generating memory reflection with provider: ${provider}`
+  );
+
+  const rawResponse =
+    await providerHandler({
+      messages,
+      model,
+      systemInstruction:
+        memoryReflectionPrompt,
+    });
+
+  let parsedResponse;
+
+  try {
+    parsedResponse =
+      typeof rawResponse === "string"
+        ? JSON.parse(rawResponse)
+        : rawResponse;
+  } catch (error) {
+    console.error(
+      "[AURA] Failed to parse reflection response:",
+      rawResponse
+    );
+
+    throw new AppError(
+      "Aura returned an invalid reflection.",
+      500
+    );
+  }
+
+  if (
+    !parsedResponse ||
+    typeof parsedResponse.reflection !==
+      "string" ||
+    !parsedResponse.reflection.trim()
+  ) {
+    throw new AppError(
+      "Aura returned an invalid reflection.",
+      500
+    );
+  }
+
+  return {
+    reflection:
+      parsedResponse.reflection.trim(),
+    metadata: {
+      provider,
+      model,
+    },
+  };
+};
 
 /**
  * =====================================================
@@ -408,4 +435,5 @@ const generateResponse = async ({
 
 module.exports = {
   generateResponse,
+  generateMemoryReflection,
 };

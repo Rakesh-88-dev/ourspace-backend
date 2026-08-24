@@ -1,10 +1,12 @@
 const express = require("express");
+
 const router = express.Router();
 
 const protect = require("../../middleware/authMiddleware");
+
 const validate = require("../../middleware/validate");
 
-// ✅ Demo Guard
+// Demo Guard
 const demoGuard = require("../../demo/middleware/demoGuard");
 
 const memoryController = require("../controllers/memory.controller");
@@ -47,6 +49,19 @@ router.get(
   "/on-this-day",
   protect,
   memoryController.getOnThisDay
+);
+
+// ==========================================
+// Generate Aura Reflection
+// ==========================================
+
+router.post(
+  "/:id/reflection",
+  protect,
+  demoGuard,
+  memoryIdValidation,
+  validate,
+  memoryController.generateReflection
 );
 
 // ==========================================

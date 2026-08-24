@@ -1,4 +1,5 @@
 const asyncHandler = require("../../middleware/asyncHandler");
+
 const memoryService = require("../services/memory.service");
 
 class MemoryController {
@@ -26,10 +27,11 @@ class MemoryController {
   getMemories = asyncHandler(async (req, res) => {
     const { space = "personal" } = req.query;
 
-    const memories = await memoryService.getMemories(
-      req.user._id,
-      space
-    );
+    const memories =
+      await memoryService.getMemories(
+        req.user._id,
+        space
+      );
 
     return res.status(200).json({
       success: true,
@@ -42,9 +44,10 @@ class MemoryController {
   // ==========================================
 
   getOnThisDay = asyncHandler(async (req, res) => {
-    const memories = await memoryService.getOnThisDay(
-      req.user._id
-    );
+    const memories =
+      await memoryService.getOnThisDay(
+        req.user._id
+      );
 
     return res.status(200).json({
       success: true,
@@ -57,11 +60,12 @@ class MemoryController {
   // ==========================================
 
   updateMemory = asyncHandler(async (req, res) => {
-    const memory = await memoryService.updateMemory(
-      req.user._id,
-      req.params.id,
-      req.body
-    );
+    const memory =
+      await memoryService.updateMemory(
+        req.user._id,
+        req.params.id,
+        req.body
+      );
 
     return res.status(200).json({
       success: true,
@@ -71,32 +75,34 @@ class MemoryController {
   });
 
   // ==========================================
-// Move Memory
-// ==========================================
+  // Move Memory
+  // ==========================================
 
-moveMemory = asyncHandler(async (req, res) => {
-  const memory = await memoryService.moveMemory(
-    req.user._id,
-    req.params.id,
-    req.body.space
-  );
+  moveMemory = asyncHandler(async (req, res) => {
+    const memory =
+      await memoryService.moveMemory(
+        req.user._id,
+        req.params.id,
+        req.body.space
+      );
 
-  return res.status(200).json({
-    success: true,
-    message: `Memory moved to ${req.body.space} successfully.`,
-    data: memory,
+    return res.status(200).json({
+      success: true,
+      message: `Memory moved to ${req.body.space} successfully.`,
+      data: memory,
+    });
   });
-});
 
   // ==========================================
   // Delete Memory
   // ==========================================
 
   deleteMemory = asyncHandler(async (req, res) => {
-    const result = await memoryService.deleteMemory(
-      req.user._id,
-      req.params.id
-    );
+    const result =
+      await memoryService.deleteMemory(
+        req.user._id,
+        req.params.id
+      );
 
     return res.status(200).json({
       success: true,
@@ -109,17 +115,40 @@ moveMemory = asyncHandler(async (req, res) => {
   // ==========================================
 
   toggleLike = asyncHandler(async (req, res) => {
-    const memory = await memoryService.toggleLike(
-      req.user._id,
-      req.params.id
-    );
+    const memory =
+      await memoryService.toggleLike(
+        req.user._id,
+        req.params.id
+      );
 
     return res.status(200).json({
       success: true,
-      message: "Memory like updated successfully.",
+      message:
+        "Memory like updated successfully.",
       data: memory,
     });
   });
+
+  // ==========================================
+  // Generate Aura Reflection
+  // ==========================================
+
+  generateReflection = asyncHandler(
+    async (req, res) => {
+      const memory =
+        await memoryService.generateReflection(
+          req.user._id,
+          req.params.id
+        );
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Aura reflection generated successfully.",
+        data: memory,
+      });
+    }
+  );
 }
 
 module.exports = new MemoryController();
