@@ -1,4 +1,5 @@
-const SpecialDateRepository = require("../special-date/specialDate.query");
+const specialDateService = require("../../special-date/services/specialDate.service");
+
 const { TOOL_TYPES } = require("./tool.types");
 
 const SpecialDateTool = {
@@ -6,41 +7,41 @@ const SpecialDateTool = {
     args,
     context,
   }) => {
-    return SpecialDateRepository.addSpecialDate({
-      userId: context.userId,
-      specialDate: args,
-    });
+    return specialDateService.createSpecialDate(
+      context.userId,
+      args,
+      null
+    );
   },
 
   [TOOL_TYPES.GET_SPECIAL_DATES]: async ({
     args,
     context,
   }) => {
-    return SpecialDateRepository.getSpecialDates({
-      userId: context.userId,
-      title: args?.title,
-    });
+    return specialDateService.getSpecialDates(
+      context.userId
+    );
   },
 
   [TOOL_TYPES.UPDATE_SPECIAL_DATE]: async ({
     args,
     context,
   }) => {
-    return SpecialDateRepository.updateSpecialDate({
-      userId: context.userId,
-      title: args.title,
-      updates: args.updates,
-    });
+    return specialDateService.updateSpecialDate(
+      context.userId,
+      args.specialDateId,
+      args.updates
+    );
   },
 
   [TOOL_TYPES.DELETE_SPECIAL_DATE]: async ({
     args,
     context,
   }) => {
-    return SpecialDateRepository.deleteSpecialDate({
-      userId: context.userId,
-      title: args.title,
-    });
+    return specialDateService.deleteSpecialDate(
+      context.userId,
+      args.specialDateId
+    );
   },
 };
 

@@ -4,7 +4,8 @@ module.exports = [
   {
     name: TOOL_TYPES.CREATE_SPECIAL_DATE,
 
-    description: "Create a special date for the current user.",
+    description:
+      "Create a special date for the current user's active relationship.",
 
     when: [
       "The user wants to add a birthday.",
@@ -27,32 +28,43 @@ module.exports = [
       date: {
         type: "string",
         required: true,
-        description: "Date in ISO format.",
+        description:
+          "The date of the event in ISO 8601 format (YYYY-MM-DD).",
       },
 
       type: {
         type: "string",
         required: false,
         description:
-          "Birthday, Anniversary, Interview, Exam, Meeting, Holiday, Travel or Custom.",
+          "Type of event: Birthday, Anniversary, Interview, Exam, Meeting, Holiday, Travel, or Custom.",
       },
 
       note: {
         type: "string",
         required: false,
-        description: "Additional note for the event.",
+        description:
+          "Optional note associated with the special date.",
       },
 
-      recurring: {
+      isRecurring: {
         type: "boolean",
         required: false,
-        description: "Whether this event repeats every year.",
+        description:
+          "Whether the special date repeats every year.",
       },
 
-      shared: {
+      reminderEnabled: {
         type: "boolean",
         required: false,
-        description: "Whether this event is shared with the partner.",
+        description:
+          "Whether a reminder should be enabled.",
+      },
+
+      reminderDaysBefore: {
+        type: "number",
+        required: false,
+        description:
+          "Number of days before the event to send the reminder. Must be between 0 and 365.",
       },
     },
   },
@@ -60,30 +72,25 @@ module.exports = [
   {
     name: TOOL_TYPES.GET_SPECIAL_DATES,
 
-    description: "Retrieve one or more special dates of the current user.",
+    description:
+      "Retrieve the current user's special dates from their active relationship.",
 
     when: [
       "The user asks for all special dates.",
       "The user asks when a birthday is.",
       "The user asks when an anniversary is.",
-      "The user asks for upcoming events.",
+      "The user asks for upcoming special dates.",
       "The user asks about an important date.",
     ],
 
-    parameters: {
-      title: {
-        type: "string",
-        required: false,
-        description:
-          "Optional title of the special date. Leave empty to fetch all.",
-      },
-    },
+    parameters: {},
   },
 
   {
     name: TOOL_TYPES.UPDATE_SPECIAL_DATE,
 
-    description: "Update an existing special date.",
+    description:
+      "Update an existing special date belonging to the user's active relationship.",
 
     when: [
       "The user wants to change a birthday.",
@@ -93,16 +100,18 @@ module.exports = [
     ],
 
     parameters: {
-      title: {
+      specialDateId: {
         type: "string",
         required: true,
-        description: "Existing title of the special date.",
+        description:
+          "MongoDB ID of the special date to update.",
       },
 
       updates: {
         type: "object",
         required: true,
-        description: "Fields to update.",
+        description:
+          "Fields to update. Supported fields include title, date, type, note, isRecurring, reminderEnabled, and reminderDaysBefore.",
       },
     },
   },
@@ -110,7 +119,8 @@ module.exports = [
   {
     name: TOOL_TYPES.DELETE_SPECIAL_DATE,
 
-    description: "Delete a special date.",
+    description:
+      "Delete a special date belonging to the user's active relationship.",
 
     when: [
       "The user wants to remove a birthday.",
@@ -120,10 +130,11 @@ module.exports = [
     ],
 
     parameters: {
-      title: {
+      specialDateId: {
         type: "string",
         required: true,
-        description: "Title of the special date to delete.",
+        description:
+          "MongoDB ID of the special date to delete.",
       },
     },
   },
