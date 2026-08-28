@@ -3,6 +3,10 @@ const specialDateService = require("../../special-date/services/specialDate.serv
 const { TOOL_TYPES } = require("./tool.types");
 
 const SpecialDateTool = {
+  // ==========================================
+  // CREATE SPECIAL DATE
+  // ==========================================
+
   [TOOL_TYPES.CREATE_SPECIAL_DATE]: async ({
     args,
     context,
@@ -14,14 +18,21 @@ const SpecialDateTool = {
     );
   },
 
+  // ==========================================
+  // GET SPECIAL DATES
+  // ==========================================
+
   [TOOL_TYPES.GET_SPECIAL_DATES]: async ({
-    args,
     context,
   }) => {
     return specialDateService.getSpecialDates(
       context.userId
     );
   },
+
+  // ==========================================
+  // UPDATE SPECIAL DATE
+  // ==========================================
 
   [TOOL_TYPES.UPDATE_SPECIAL_DATE]: async ({
     args,
@@ -33,6 +44,10 @@ const SpecialDateTool = {
       args.updates
     );
   },
+
+  // ==========================================
+  // DELETE SPECIAL DATE
+  // ==========================================
 
   [TOOL_TYPES.DELETE_SPECIAL_DATE]: async ({
     args,

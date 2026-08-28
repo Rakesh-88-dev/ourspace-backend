@@ -1,11 +1,15 @@
 const { TOOL_TYPES } = require("../tool.types");
 
 module.exports = [
+  // ==========================================
+  // CREATE SPECIAL DATE
+  // ==========================================
+
   {
     name: TOOL_TYPES.CREATE_SPECIAL_DATE,
 
     description:
-      "Create a special date for the current user's active relationship.",
+      "Create a special date for the user's active relationship.",
 
     when: [
       "The user wants to add a birthday.",
@@ -22,75 +26,84 @@ module.exports = [
       title: {
         type: "string",
         required: true,
-        description: "Title of the special date.",
+        description:
+          "Title of the special date.",
       },
 
       date: {
         type: "string",
         required: true,
         description:
-          "The date of the event in ISO 8601 format (YYYY-MM-DD).",
+          "Date of the event in ISO 8601 format, such as 2026-09-15.",
       },
 
       type: {
         type: "string",
         required: false,
         description:
-          "Type of event: Birthday, Anniversary, Interview, Exam, Meeting, Holiday, Travel, or Custom.",
+          "Event type: Birthday, Anniversary, Interview, Exam, Meeting, Holiday, Travel, or Custom.",
       },
 
       note: {
         type: "string",
         required: false,
         description:
-          "Optional note associated with the special date.",
+          "Optional note for the special date.",
       },
 
       isRecurring: {
         type: "boolean",
         required: false,
         description:
-          "Whether the special date repeats every year.",
+          "Whether the event repeats every year.",
       },
 
       reminderEnabled: {
         type: "boolean",
         required: false,
         description:
-          "Whether a reminder should be enabled.",
+          "Whether reminders are enabled for this special date.",
       },
 
       reminderDaysBefore: {
         type: "number",
         required: false,
         description:
-          "Number of days before the event to send the reminder. Must be between 0 and 365.",
+          "Number of days before the event for the reminder, from 0 to 365.",
       },
     },
   },
+
+  // ==========================================
+  // GET SPECIAL DATES
+  // ==========================================
 
   {
     name: TOOL_TYPES.GET_SPECIAL_DATES,
 
     description:
-      "Retrieve the current user's special dates from their active relationship.",
+      "Retrieve the special dates belonging to the user's active relationship.",
 
     when: [
-      "The user asks for all special dates.",
+      "The user asks for their special dates.",
       "The user asks when a birthday is.",
       "The user asks when an anniversary is.",
-      "The user asks for upcoming special dates.",
+      "The user asks about upcoming special dates.",
       "The user asks about an important date.",
     ],
 
     parameters: {},
   },
 
+  // ==========================================
+  // UPDATE SPECIAL DATE
+  // ==========================================
+
   {
     name: TOOL_TYPES.UPDATE_SPECIAL_DATE,
 
     description:
-      "Update an existing special date belonging to the user's active relationship.",
+      "Update a special date belonging to the user's active relationship.",
 
     when: [
       "The user wants to change a birthday.",
@@ -115,6 +128,10 @@ module.exports = [
       },
     },
   },
+
+  // ==========================================
+  // DELETE SPECIAL DATE
+  // ==========================================
 
   {
     name: TOOL_TYPES.DELETE_SPECIAL_DATE,

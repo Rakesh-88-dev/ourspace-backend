@@ -27,7 +27,6 @@ const AURA_PERMISSIONS = Object.freeze({
 
   MEMORY_PERSONAL_READ: "memory.personal.read",
   MEMORY_SHARED_READ: "memory.shared.read",
-
   MEMORY_CREATE: "memory.create",
   MEMORY_UPDATE: "memory.update",
   MEMORY_DELETE: "memory.delete",
@@ -67,15 +66,35 @@ const DEFAULT_AURA_PERMISSIONS = Object.freeze([
   AURA_PERMISSIONS.PROFILE_READ,
   AURA_PERMISSIONS.RELATIONSHIP_READ,
 
+  // ==========================================
+  // Aura Long-Term Memory
+  // ==========================================
+
   AURA_PERMISSIONS.AI_MEMORY_READ,
   AURA_PERMISSIONS.AI_MEMORY_CREATE,
   AURA_PERMISSIONS.AI_MEMORY_UPDATE,
 
+  // ==========================================
   // Wishlist
+  // ==========================================
+
   AURA_PERMISSIONS.WISHLIST_READ,
   AURA_PERMISSIONS.WISHLIST_CREATE,
 
+  // ==========================================
+  // Special Dates
+  // ==========================================
+
   AURA_PERMISSIONS.SPECIAL_DATE_READ,
+  AURA_PERMISSIONS.SPECIAL_DATE_CREATE,
+  AURA_PERMISSIONS.SPECIAL_DATE_UPDATE,
+
+  // Delete intentionally remains opt-in.
+  // AURA_PERMISSIONS.SPECIAL_DATE_DELETE,
+
+  // ==========================================
+  // Conversations
+  // ==========================================
 
   AURA_PERMISSIONS.CHAT_READ,
 ]);
