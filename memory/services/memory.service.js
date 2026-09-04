@@ -133,6 +133,22 @@ class MemoryService {
   }
 
   // ==========================================
+// Dashboard Memories
+// ==========================================
+
+async getDashboardMemories(userId) {
+  const relationship =
+    await relationshipRepository.findActiveRelationship(
+      userId
+    );
+
+  return memoryRepository.findDashboardMemories(
+    userId,
+    relationship?._id || null
+  );
+}
+
+  // ==========================================
   // Update Memory
   // ==========================================
 

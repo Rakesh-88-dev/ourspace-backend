@@ -51,6 +51,44 @@ async findPersonalMemories(userId) {
     });
 }
 
+
+// ==========================================
+// Dashboard Memories
+// Personal + Shared
+// ==========================================
+
+async findDashboardMemories(
+  userId,
+  relationshipId
+) {
+  const accessConditions = [
+    {
+      space: "personal",
+      uploadedBy: userId,
+    },
+  ];
+
+  if (relationshipId) {
+    accessConditions.push({
+      space: "shared",
+      relationship: relationshipId,
+    });
+  }
+
+  return Memory.find({
+    isDeleted: false,
+
+    $or: accessConditions,
+  })
+    .populate(
+      "uploadedBy",
+      "name email avatar"
+    )
+    .sort({
+      createdAt: -1,
+    });
+}
+
   // ==========================================
   // Recent Memories
   // ==========================================

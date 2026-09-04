@@ -149,6 +149,27 @@ class MemoryController {
       });
     }
   );
+
+  // ==========================================
+// Get Dashboard Memories
+// ==========================================
+
+getDashboardMemories = asyncHandler(
+  async (req, res) => {
+    const memories =
+      await memoryService.getDashboardMemories(
+        req.user._id
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: memories,
+    });
+  }
+);
+
 }
+
+
 
 module.exports = new MemoryController();

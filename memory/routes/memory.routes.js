@@ -1,12 +1,8 @@
 const express = require("express");
-
 const router = express.Router();
 
 const protect = require("../../middleware/authMiddleware");
-
 const validate = require("../../middleware/validate");
-
-// Demo Guard
 const demoGuard = require("../../demo/middleware/demoGuard");
 
 const memoryController = require("../controllers/memory.controller");
@@ -32,13 +28,24 @@ router.post(
 
 // ==========================================
 // Get Memories
-// Query: ?space=shared | personal
+// Personal / Shared
 // ==========================================
 
 router.get(
   "/",
   protect,
   memoryController.getMemories
+);
+
+// ==========================================
+// Get Dashboard Memories
+// Personal + Shared
+// ==========================================
+
+router.get(
+  "/dashboard",
+  protect,
+  memoryController.getDashboardMemories
 );
 
 // ==========================================
@@ -105,7 +112,7 @@ router.put(
 );
 
 // ==========================================
-// Delete Memory (Soft Delete)
+// Delete Memory
 // ==========================================
 
 router.delete(
